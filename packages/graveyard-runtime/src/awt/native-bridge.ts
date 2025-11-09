@@ -138,7 +138,8 @@ export class NativeMethodBridge {
       g.drawString(str, x, y);
     });
     this.register("java/awt/Graphics.drawImage", (g: Graphics, img: any, x: number, y: number, ...args: any[]) => {
-      g.drawImage(img, x, y, ...args);
+      // Use apply to handle overloaded method signature
+      (g.drawImage as any).apply(g, [img, x, y, ...args]);
     });
   }
 
