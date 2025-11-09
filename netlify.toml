@@ -1,10 +1,11 @@
 [build]
   # Monorepo için root'ta build yap, her iki Next.js uygulamasını da build et
-  # Path-based routing: /necrodev/* -> necrodev, /* -> necroplay
+  # Path-based routing: /* -> necrodev (root), /necroplay/* -> necroplay
   base = "."
   command = "pnpm run build:netlify"
-  # Necroplay root'ta, necrodev /necrodev path'inde
-  publish = "apps/necroplay/.next"
+  # Necrodev root'ta, necroplay /necroplay path'inde
+  # Her iki uygulamanın build output'u birleştirilmiş olacak
+  publish = "apps/necrodev/.next"
 
 [build.environment]
   NODE_VERSION = "18"
@@ -13,23 +14,25 @@
   PNPM_FLAGS = "--filter @necroverse/necrodev... --filter @necroverse/necroplay..."
 
 # Path-based routing için redirects
-# /necrodev/* -> necrodev uygulamasına yönlendir
-# Necrodev basePath ile /necrodev prefix'i eklenmiş, bu yüzden direkt olarak çalışır
-[[redirects]]
-  from = "/necrodev/*"
-  to = "/necrodev/:splat"
-  status = 200
-  force = true
-
-# Necrodev static assets için
-[[redirects]]
-  from = "/necrodev/_next/*"
-  to = "/necrodev/_next/:splat"
-  status = 200
-  force = true
-
-# Root ve diğer path'ler -> necroplay uygulamasına yönlendir (Next.js plugin otomatik yönetir)
-# Next.js plugin sadece bir uygulama için çalışır, bu yüzden necroplay root'ta
+# Root ve diğer path'ler -> necrodev uygulamasına yönlendir (Next.js plugin otomatik yönetir)
+# Next.js plugin sadece bir uygulama için çalışır, bu yüzden necrodev root'ta
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-  # Next.js plugin otomatik olarak apps/necroplay dizinindeki Next.js'i algılar
+  # Next.js plugin otomatik olarak apps/necrodev dizinindeki Next.js'i algılar
+
+# Necroplay için path-based routing
+# /necroplay/* -> necroplay uygulamasına yönlendir
+# Necroplay basePath ile /necroplay prefix'i eklenmiş, bu yüzden direkt olarak çalışır
+# Not: Necroplay build output'u necrodev build output'una merge edilmiş olacak
+[[redirects]]
+  from = "/necroplay"
+  to = "/necroplay/"
+  status = 200
+  force = true
+
+# Necroplay için tüm path'leri yönlendir
+[[redirects]]
+  from = "/necroplay/*"
+  to = "/necroplay/:splat"
+  status = 200
+  force = true
