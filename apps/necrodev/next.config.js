@@ -3,8 +3,12 @@ const path = require("path");
 
 const nextConfig = {
   reactStrictMode: true,
-  // Ayrı Netlify sitesi olarak deploy edilecek, basePath gerekmez
-  // basePath: process.env.NEXT_PUBLIC_BASE_PATH || "",
+  // GitHub Pages için static export
+  output: process.env.NEXT_EXPORT ? 'export' : undefined,
+  // GitHub Pages için basePath (repo adına göre ayarlanabilir)
+  basePath: process.env.NEXT_PUBLIC_BASE_PATH || "",
+  // GitHub Pages için trailingSlash
+  trailingSlash: true,
   transpilePackages: ["@necroverse/ui", "@necroverse/graveyard-runtime"],
   // Ignore TypeScript errors during build (allows build to continue with type errors)
   typescript: {
