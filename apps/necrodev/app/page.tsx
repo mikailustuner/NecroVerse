@@ -85,15 +85,21 @@ export default function HomePage() {
 
   return (
     <div
-      className={`min-h-screen flex flex-col items-center justify-center relative overflow-hidden ${
+      className={`min-h-screen flex flex-col items-center justify-center relative overflow-hidden bg-background ${
         bloodMode ? "blood-mode" : ""
       }`}
+      style={{ backgroundColor: "#0a0612", color: "#f5f5f5" }}
     >
       {/* Documentation button */}
       <div className="absolute top-8 right-8 z-50">
         <Button
           variant="violet"
-          onClick={() => (window.location.href = "http://localhost:3002/docs")}
+          onClick={() => {
+            const docsUrl = process.env.NEXT_PUBLIC_NECROPLAY_URL 
+              ? `${process.env.NEXT_PUBLIC_NECROPLAY_URL}/docs`
+              : "https://necroplay.netlify.app/docs";
+            window.location.href = docsUrl;
+          }}
           className="gap-2"
         >
           📚 Docs
@@ -118,7 +124,8 @@ export default function HomePage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        className="text-center z-10"
+        className="text-center z-10 relative"
+        style={{ zIndex: 10 }}
       >
         <motion.h1
           className="text-6xl md:text-8xl font-bold mb-8 cursor-pointer"
@@ -129,6 +136,8 @@ export default function HomePage() {
             textShadow: bloodMode
               ? "0 0 20px rgba(255, 0, 110, 0.8)"
               : "0 0 20px rgba(168, 85, 247, 0.8)",
+            position: "relative",
+            zIndex: 10,
           }}
         >
           <GlitchText>Necroverse</GlitchText>
@@ -139,6 +148,11 @@ export default function HomePage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
+          style={{
+            color: "#00fff7",
+            position: "relative",
+            zIndex: 10,
+          }}
         >
           Where Dead Tech Breathes Again
         </motion.p>
@@ -148,6 +162,7 @@ export default function HomePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
+          style={{ position: "relative", zIndex: 10 }}
         >
           <Button
             variant="violet"
