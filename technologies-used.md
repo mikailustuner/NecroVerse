@@ -1,0 +1,1 @@
+vreact, next.js, typescript, tailwind css, framer motion, vite, turborepo, pnpm, eslint, prettier, rust, webassembly, node.js, indexeddb, localstorage, html5 canvas, web audio api, radix ui, lucide icons, monorepo, wasm, event-driven architecture, custom os layers, package-based architecture, kiro ai

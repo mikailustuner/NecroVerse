@@ -24,6 +24,7 @@ interface FileRecord {
   type: string;
   status: string;
   conversion_url?: string;
+  storage_path?: string;
   metadata?: any;
   created_at: string;
 }
