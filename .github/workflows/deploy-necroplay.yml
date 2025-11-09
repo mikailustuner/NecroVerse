@@ -62,6 +62,26 @@ jobs:
           NEXT_EXPORT: true
           NEXT_PUBLIC_BASE_PATH: ${{ steps.repo.outputs.base_path }}
 
+      - name: Build Necrodev
+        run: pnpm run build:github:necrodev
+        env:
+          NEXT_EXPORT: true
+          NEXT_PUBLIC_BASE_PATH: ${{ steps.repo.outputs.base_path }}/necrodev
+
+      - name: Merge build outputs
+        run: |
+          # Necrodev'in build output'unu necroplay'in build output'una kopyala
+          # Necrodev /NecroVerse/necrodev path'inde olacak
+          if [ -d "apps/necrodev/out" ]; then
+            mkdir -p apps/necroplay/out/necrodev
+            # Necrodev'in tüm dosyalarını kopyala
+            cp -r apps/necrodev/out/* apps/necroplay/out/necrodev/
+            # _next klasörünü de kopyala (asset'ler için)
+            if [ -d "apps/necrodev/out/_next" ]; then
+              cp -r apps/necrodev/out/_next apps/necroplay/out/necrodev/
+            fi
+          fi
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
         with:
