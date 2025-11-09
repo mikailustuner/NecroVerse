@@ -81,48 +81,48 @@ export function attachDOMEventListeners(canvas: HTMLCanvasElement, component: Co
   // Mouse events
   canvas.addEventListener('mousedown', (e) => {
     const mouseEvent = mapMouseEvent(e, component);
-    component.listeners.fireMouseEvent(mouseEvent);
+    component.fireMouseEvent(mouseEvent);
   });
   
   canvas.addEventListener('mouseup', (e) => {
     const mouseEvent = mapMouseEvent(e, component);
-    component.listeners.fireMouseEvent(mouseEvent);
+    component.fireMouseEvent(mouseEvent);
   });
   
   canvas.addEventListener('click', (e) => {
     const mouseEvent = mapMouseEvent(e, component);
-    component.listeners.fireMouseEvent(mouseEvent);
+    component.fireMouseEvent(mouseEvent);
   });
   
   canvas.addEventListener('mousemove', (e) => {
     const mouseEvent = mapMouseEvent(e, component);
-    component.listeners.fireMouseEvent(mouseEvent);
+    component.fireMouseEvent(mouseEvent);
   });
   
   canvas.addEventListener('mouseenter', (e) => {
     const mouseEvent = mapMouseEvent(e, component);
-    component.listeners.fireMouseEvent(mouseEvent);
+    component.fireMouseEvent(mouseEvent);
   });
   
   canvas.addEventListener('mouseleave', (e) => {
     const mouseEvent = mapMouseEvent(e, component);
-    component.listeners.fireMouseEvent(mouseEvent);
+    component.fireMouseEvent(mouseEvent);
   });
   
   // Keyboard events
   canvas.addEventListener('keydown', (e) => {
     const keyEvent = mapKeyEvent(e, component);
-    component.listeners.fireKeyEvent(keyEvent);
+    component.fireKeyEvent(keyEvent);
   });
   
   canvas.addEventListener('keyup', (e) => {
     const keyEvent = mapKeyEvent(e, component);
-    component.listeners.fireKeyEvent(keyEvent);
+    component.fireKeyEvent(keyEvent);
   });
   
   canvas.addEventListener('keypress', (e) => {
     const keyEvent = mapKeyEvent(e, component);
-    component.listeners.fireKeyEvent(keyEvent);
+    component.fireKeyEvent(keyEvent);
   });
   
   // Make canvas focusable for keyboard events

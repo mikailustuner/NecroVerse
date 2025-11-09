@@ -225,6 +225,27 @@ export abstract class Component {
   requestRepaint(): void {
     this.repaint();
   }
+
+  /**
+   * Fire mouse event (public method for external event mappers)
+   */
+  fireMouseEvent(event: MouseEvent): void {
+    this.listeners.fireMouseEvent(event);
+  }
+
+  /**
+   * Fire key event (public method for external event mappers)
+   */
+  fireKeyEvent(event: KeyEvent): void {
+    this.listeners.fireKeyEvent(event);
+  }
+
+  /**
+   * Fire action event (public method for external event mappers)
+   */
+  fireActionEvent(event: ActionEvent): void {
+    this.listeners.fireActionEvent(event);
+  }
 }
 
 /**
