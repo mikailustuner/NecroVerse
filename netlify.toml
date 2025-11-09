@@ -1,8 +1,9 @@
 [build]
-  # Monorepo için root'ta install yap, sadece necrodev'i build et
+  # Monorepo için root'ta build yap, Next.js plugin otomatik olarak apps/necrodev'i algılar
   # Bu dosya necrodev için - root'ta deploy edildiğinde necrodev açılır
   base = "."
   command = "pnpm run build:netlify"
+  # Next.js plugin monorepo için otomatik olarak doğru dizini algılar
   publish = "apps/necrodev/.next"
 
 [build.environment]
@@ -15,9 +16,4 @@
   package = "@netlify/plugin-nextjs"
   # Next.js plugin otomatik olarak Next.js'i algılar ve build eder
   # Monorepo için otomatik olarak apps/necrodev dizinindeki Next.js'i algılar
-
-# Next.js plugin otomatik redirects ekler, ama yine de ekleyelim
-[[redirects]]
-  from = "/*"
-  to = "/.netlify/functions/next"
-  status = 200
+  # Plugin otomatik olarak redirects ve functions'ı yönetir
