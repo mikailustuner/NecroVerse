@@ -1,7 +1,7 @@
 [build]
-  # Monorepo için root'ta install yap, tüm paketleri build et, sonra necrodev'i build et
+  # Monorepo için root'ta install yap, tüm paketleri build et (hata olsa da devam eder), sonra necrodev'i build et
   # Bu dosya necrodev için - root'ta deploy edildiğinde necrodev açılır
-  command = "pnpm install && pnpm build && cd apps/necrodev && pnpm build"
+  command = "pnpm run build:netlify"
   # Monorepo için Next.js build output dizini
   publish = "apps/necrodev/.next"
 

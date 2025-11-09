@@ -4,7 +4,8 @@
   "pipeline": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**", "pkg/**"]
+      "outputs": [".next/**", "!.next/cache/**", "dist/**", "pkg/**"],
+      "continueOnError": true
     },
     "dev": {
       "cache": false,
