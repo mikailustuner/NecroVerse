@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build --continue",
-    "build:netlify": "pnpm install --no-frozen-lockfile && pnpm --filter @necroverse/necrodev build",
+    "build:netlify": "pnpm install --no-frozen-lockfile && pnpm --filter @necroverse/necrodev build && pnpm --filter @necroverse/necroplay build && node scripts/merge-netlify-builds.js",
+    "build:netlify:necroplay": "pnpm install --no-frozen-lockfile && pnpm --filter @necroverse/necroplay build",
+    "build:netlify:all": "pnpm install --no-frozen-lockfile && pnpm --filter @necroverse/necrodev build && pnpm --filter @necroverse/necroplay build",
     "build:vercel": "pnpm install --no-frozen-lockfile && pnpm --filter @necroverse/necrodev build",
     "build:amiron": "pnpm --filter @amiron/exec build && pnpm --filter @amiron/pal build && pnpm --filter @amiron/workbench build && pnpm --filter @amiron/ritual-api build && pnpm --filter amiron build",
     "lint": "turbo run lint",

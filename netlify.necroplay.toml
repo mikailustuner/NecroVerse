@@ -1,0 +1,20 @@
+[build]
+  # Monorepo için root'ta build yap, Next.js plugin otomatik olarak apps/necroplay'i algılar
+  # Bu dosya necroplay için - root'ta deploy edildiğinde necroplay açılır
+  base = "."
+  command = "pnpm run build:netlify:necroplay"
+  # Next.js plugin monorepo için otomatik olarak doğru dizini algılar
+  publish = "apps/necroplay/.next"
+
+[build.environment]
+  NODE_VERSION = "18"
+  PNPM_VERSION = "8.12.0"
+  # Monorepo için workspace ayarları
+  PNPM_FLAGS = "--filter @necroverse/necroplay..."
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+  # Next.js plugin otomatik olarak Next.js'i algılar ve build eder
+  # Monorepo için otomatik olarak apps/necroplay dizinindeki Next.js'i algılar
+  # Plugin otomatik olarak redirects ve functions'ı yönetir
+

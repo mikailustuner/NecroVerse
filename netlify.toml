@@ -1,19 +1,35 @@
 [build]
-  # Monorepo için root'ta build yap, Next.js plugin otomatik olarak apps/necrodev'i algılar
-  # Bu dosya necrodev için - root'ta deploy edildiğinde necrodev açılır
+  # Monorepo için root'ta build yap, her iki Next.js uygulamasını da build et
+  # Path-based routing: /necrodev/* -> necrodev, /* -> necroplay
   base = "."
   command = "pnpm run build:netlify"
-  # Next.js plugin monorepo için otomatik olarak doğru dizini algılar
-  publish = "apps/necrodev/.next"
+  # Necroplay root'ta, necrodev /necrodev path'inde
+  publish = "apps/necroplay/.next"
 
 [build.environment]
   NODE_VERSION = "18"
   PNPM_VERSION = "8.12.0"
   # Monorepo için workspace ayarları
-  PNPM_FLAGS = "--filter @necroverse/necrodev..."
+  PNPM_FLAGS = "--filter @necroverse/necrodev... --filter @necroverse/necroplay..."
 
+# Path-based routing için redirects
+# /necrodev/* -> necrodev uygulamasına yönlendir
+# Necrodev basePath ile /necrodev prefix'i eklenmiş, bu yüzden direkt olarak çalışır
+[[redirects]]
+  from = "/necrodev/*"
+  to = "/necrodev/:splat"
+  status = 200
+  force = true
+
+# Necrodev static assets için
+[[redirects]]
+  from = "/necrodev/_next/*"
+  to = "/necrodev/_next/:splat"
+  status = 200
+  force = true
+
+# Root ve diğer path'ler -> necroplay uygulamasına yönlendir (Next.js plugin otomatik yönetir)
+# Next.js plugin sadece bir uygulama için çalışır, bu yüzden necroplay root'ta
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-  # Next.js plugin otomatik olarak Next.js'i algılar ve build eder
-  # Monorepo için otomatik olarak apps/necrodev dizinindeki Next.js'i algılar
-  # Plugin otomatik olarak redirects ve functions'ı yönetir
+  # Next.js plugin otomatik olarak apps/necroplay dizinindeki Next.js'i algılar

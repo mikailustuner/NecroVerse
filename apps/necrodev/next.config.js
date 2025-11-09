@@ -3,6 +3,8 @@ const path = require("path");
 
 const nextConfig = {
   reactStrictMode: true,
+  // Netlify'da path-based routing için basePath ayarla
+  basePath: process.env.NEXT_PUBLIC_BASE_PATH || "/necrodev",
   transpilePackages: ["@necroverse/ui", "@necroverse/graveyard-runtime"],
   // Ignore TypeScript errors during build (allows build to continue with type errors)
   typescript: {
