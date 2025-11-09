@@ -9,7 +9,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc --build",
+    "build": "pnpm --filter @amiron/pal build && tsc --build",
     "clean": "rimraf dist",
     "type-check": "tsc --noEmit"
   },
