@@ -97,7 +97,7 @@ export default function HomePage() {
           onClick={() => {
             const docsUrl = process.env.NEXT_PUBLIC_NECROPLAY_URL 
               ? `${process.env.NEXT_PUBLIC_NECROPLAY_URL}/docs`
-              : "https://necroplay.netlify.app/docs";
+              : "https://mikailustuner.github.io/necroverse/docs";
             window.location.href = docsUrl;
           }}
           className="gap-2"
