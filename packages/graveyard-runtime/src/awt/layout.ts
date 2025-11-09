@@ -3,8 +3,20 @@
  * Common AWT layout managers
  */
 
-import { LayoutManager } from "./component";
 import { Container, Component } from "./component";
+
+/**
+ * LayoutManager interface
+ */
+export interface LayoutManager {
+  addLayoutComponent(comp: Component, constraints?: any): void;
+  removeLayoutComponent(comp: Component): void;
+  removeAllComponents(): void;
+  layoutContainer(parent: Container): void;
+  minimumLayoutSize(parent: Container): { width: number; height: number };
+  preferredLayoutSize(parent: Container): { width: number; height: number };
+  maximumLayoutSize(parent: Container): { width: number; height: number };
+}
 
 /**
  * FlowLayout - arranges components in a row

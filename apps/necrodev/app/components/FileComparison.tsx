@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
 import { Button } from "@ui";
 
 export interface FileComparisonProps {
@@ -34,14 +33,14 @@ export function FileComparison({
         <div className="flex gap-2">
           <Button
             onClick={() => setViewMode("side-by-side")}
-            variant={viewMode === "side-by-side" ? "primary" : "secondary"}
+            variant={viewMode === "side-by-side" ? "violet" : "cyan"}
             className="px-3 py-1 text-xs"
           >
             Side by Side
           </Button>
           <Button
             onClick={() => setViewMode("overlay")}
-            variant={viewMode === "overlay" ? "primary" : "secondary"}
+            variant={viewMode === "overlay" ? "violet" : "cyan"}
             className="px-3 py-1 text-xs"
           >
             Overlay

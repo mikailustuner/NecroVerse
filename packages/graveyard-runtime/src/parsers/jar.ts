@@ -55,23 +55,31 @@ export class JARParser {
    * Try to find main class by looking for classes with main method
    */
   private async findMainClass(classes: JARClass[]): Promise<string | undefined> {
+    console.log("[JARParser] Searching for main class among", classes.length, "classes");
+    
     // Look for classes with "main" in the name (common pattern)
     const mainCandidates = classes.filter(c => 
       c.name.toLowerCase().includes("main") || 
       c.name.toLowerCase().endsWith("app") ||
-      c.name.toLowerCase().endsWith("application")
+      c.name.toLowerCase().endsWith("application") ||
+      c.name.toLowerCase().includes("applet")
     );
+
+    console.log("[JARParser] Found", mainCandidates.length, "main candidates:", mainCandidates.map(c => c.name));
 
     if (mainCandidates.length > 0) {
       // Return the first candidate
+      console.log("[JARParser] Selected main class:", mainCandidates[0].name);
       return mainCandidates[0].name;
     }
 
     // If no obvious candidates, return the first class
     if (classes.length > 0) {
+      console.log("[JARParser] No obvious main class, using first class:", classes[0].name);
       return classes[0].name;
     }
 
+    console.warn("[JARParser] No classes found in JAR");
     return undefined;
   }
 

@@ -104,7 +104,7 @@ export function ShareDialog({
                 />
                 <Button
                   onClick={() => copyToClipboard(shareLink || generateShareLink())}
-                  variant="secondary"
+                  variant="cyan"
                   className="px-3 py-2"
                 >
                   {copied ? "Copied!" : "Copy"}
@@ -124,7 +124,7 @@ export function ShareDialog({
                 />
                 <Button
                   onClick={() => copyToClipboard(embedCode || generateEmbedCode())}
-                  variant="secondary"
+                  variant="cyan"
                   className="px-3 py-2"
                 >
                   {copied ? "Copied!" : "Copy"}

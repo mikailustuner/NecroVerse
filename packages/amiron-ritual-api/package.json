@@ -1,0 +1,25 @@
+{
+  "name": "@amiron/ritual-api",
+  "version": "0.1.0",
+  "description": "Amiron Ritual API - Public interface for application development",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf dist",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@amiron/exec": "workspace:*",
+    "@amiron/intuition": "workspace:*",
+    "@amiron/pal": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "rimraf": "^5.0.5"
+  }
+}

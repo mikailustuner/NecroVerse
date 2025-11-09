@@ -15,14 +15,28 @@ export class ConstantPoolResolver {
    * Get UTF-8 string from constant pool
    */
   getUtf8(index: number): string {
+    if (index < 0 || index >= this.classFile.constantPool.length) {
+      console.error(`[ConstantPoolResolver] Index ${index} out of bounds (pool size: ${this.classFile.constantPool.length})`);
+      return `<invalid-index-${index}>`;
+    }
+    
     const entry = this.classFile.constantPool[index];
     if (!entry) {
-      throw new Error(`Constant pool index ${index} out of bounds`);
+      console.error(`[ConstantPoolResolver] Constant pool entry ${index} is null`);
+      return `<null-entry-${index}>`;
     }
+    
     if (entry.tag === 1) {
-      return entry.value as string;
+      const value = entry.value;
+      if (typeof value === 'string') {
+        return value;
+      }
+      console.error(`[ConstantPoolResolver] UTF-8 entry ${index} has non-string value:`, typeof value);
+      return `<invalid-utf8-${index}>`;
     }
-    throw new Error(`Constant pool entry ${index} is not a UTF-8 string (tag: ${entry.tag})`);
+    
+    console.error(`[ConstantPoolResolver] Constant pool entry ${index} is not a UTF-8 string (tag: ${entry.tag})`);
+    return `<wrong-tag-${index}>`;
   }
 
   /**

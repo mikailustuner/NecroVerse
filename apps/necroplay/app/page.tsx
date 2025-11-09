@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { Button, GlitchText } from "@ui";
+import { AmironLauncher } from "./components/AmironLauncher";
 
 interface FileRecord {
   id: string;
@@ -74,6 +75,15 @@ export default function GraveyardPage() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
         >
+          <div className="flex justify-end mb-4">
+            <Button
+              variant="violet"
+              onClick={() => router.push("/docs")}
+              className="gap-2"
+            >
+              📚 Documentation
+            </Button>
+          </div>
           <h1 className="text-5xl md:text-7xl font-bold mb-4 text-accent-glow">
             <GlitchText>NecroPlay</GlitchText>
           </h1>
@@ -105,6 +115,10 @@ export default function GraveyardPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {/* System Applications */}
+            <AmironLauncher index={0} />
+            
+            {/* Resurrected Files */}
             {filteredFiles.map((file, index) => (
               <motion.div
                 key={file.id}

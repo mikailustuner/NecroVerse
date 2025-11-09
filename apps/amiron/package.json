@@ -1,0 +1,26 @@
+{
+  "name": "amiron",
+  "version": "0.1.0",
+  "description": "Amiron Desktop Environment",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "pnpm run build:wasm && vite build",
+    "build:wasm": "pnpm --filter @amiron/exec build",
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@amiron/exec": "workspace:*",
+    "@amiron/intuition": "workspace:*",
+    "@amiron/pal": "workspace:*",
+    "@amiron/ritual-api": "workspace:*",
+    "@amiron/workbench": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "vite": "^5.0.10",
+    "vite-plugin-wasm": "^3.3.0",
+    "vite-plugin-top-level-await": "^1.4.1"
+  }
+}

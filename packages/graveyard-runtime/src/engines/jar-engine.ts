@@ -217,6 +217,8 @@ export class JVMInterpreter {
   private currentMethod: JavaMethod | null = null;
   private objectHeap: Map<number, any> = new Map();
   private nextObjectId: number = 1;
+  private callStack: Array<{ className: string; methodName: string }> = [];
+  private maxCallStackDepth: number = 100;
 
   constructor() {
     this.bytecodeParser = new JavaBytecodeParser();
@@ -266,14 +268,57 @@ export class JVMInterpreter {
         methods: parsedClass.methods.map(m => {
           const methodName = resolver.getUtf8(m.nameIndex);
           const methodDescriptor = resolver.getUtf8(m.descriptorIndex);
-          const parsedDescriptor = parseMethodDescriptor(methodDescriptor);
+          
+          // Try to parse method descriptor, but handle errors gracefully
+          let parsedDescriptor: MethodDescriptor | null = null;
+          try {
+            // Validate descriptor format first
+            if (!methodDescriptor || typeof methodDescriptor !== 'string') {
+              console.warn(`[JVMInterpreter] Method ${methodName} has invalid descriptor type:`, typeof methodDescriptor);
+              parsedDescriptor = {
+                parameters: [],
+                returnType: { type: 'void' },
+              };
+            } else if (methodDescriptor.startsWith('(')) {
+              // Valid descriptor format
+              parsedDescriptor = parseMethodDescriptor(methodDescriptor);
+            } else {
+              // Invalid descriptor format - likely corrupted constant pool
+              console.warn(`[JVMInterpreter] Method ${methodName} has invalid descriptor format: ${methodDescriptor}`);
+              console.warn(`[JVMInterpreter] This may indicate a corrupted class file or constant pool parsing error`);
+              // Create a fallback descriptor based on method name
+              parsedDescriptor = {
+                parameters: [],
+                returnType: { type: 'void' },
+              };
+            }
+          } catch (error) {
+            console.warn(`[JVMInterpreter] Failed to parse method descriptor for ${methodName}: ${methodDescriptor}`, error);
+            // Create a more intelligent fallback descriptor
+            // Try to infer from descriptor string if possible
+            if (typeof methodDescriptor === 'string') {
+              const paramCount = (methodDescriptor.match(/[ZBCSIJFD]|\[+[ZBCSIJFD]|L[^;]+;/g) || []).length;
+              parsedDescriptor = {
+                parameters: Array(paramCount).fill({ type: 'object' }),
+                returnType: { type: 'void' },
+              };
+            } else {
+              parsedDescriptor = {
+                parameters: [],
+                returnType: { type: 'void' },
+              };
+            }
+          }
           
           return {
             name: methodName,
             descriptor: methodDescriptor,
             accessFlags: m.accessFlags,
             code: m.code?.code || new Uint8Array(0),
-            parsedDescriptor,
+            parsedDescriptor: parsedDescriptor || {
+              parameters: [],
+              returnType: { type: 'void' },
+            },
             maxStack: m.code?.maxStack,
             maxLocals: m.code?.maxLocals,
           };
@@ -297,21 +342,55 @@ export class JVMInterpreter {
       throw new Error(`Class ${className} not found`);
     }
 
-    // Find method (support method overloading by descriptor)
+    // Find method in class hierarchy (support method overloading by descriptor)
     let method: JavaMethod | undefined;
-    if (args.length === 0 && methodName === 'main') {
-      // Try to find main method
-      method = javaClass.methods.find((m) => m.name === methodName && m.parsedDescriptor?.parameters.length === 1);
-    } else {
-      method = javaClass.methods.find((m) => m.name === methodName);
+    let targetClass: JavaClass | undefined;
+    
+    // Traverse class hierarchy to find method
+    let currentClassName: string | undefined = className;
+    while (currentClassName) {
+      const currentClass = this.classes.get(currentClassName);
+      if (!currentClass) {
+        break;
+      }
+      
+      // Try to find method in current class
+      if (args.length === 0 && methodName === 'main') {
+        // Try to find main method with String[] parameter
+        method = currentClass.methods.find((m) => 
+          m.name === methodName && 
+          (m.parsedDescriptor?.parameters.length === 1 || m.descriptor.includes('[Ljava/lang/String'))
+        );
+      } else {
+        // Find method by name (first match wins, Java uses first match in hierarchy)
+        method = currentClass.methods.find((m) => m.name === methodName);
+      }
+      
+      if (method) {
+        targetClass = currentClass;
+        break;
+      }
+      
+      // Try superclass
+      currentClassName = currentClass.superClassName;
     }
     
-    if (!method) {
-      throw new Error(`Method ${methodName} not found in ${className}`);
+    if (!method || !targetClass) {
+      // Log available methods for debugging
+      const availableMethods = javaClass.methods.map(m => `${m.name}${m.descriptor || ''}`).join(', ');
+      const errorMsg = `Method ${methodName} not found in ${className} (available: ${availableMethods || 'none'})`;
+      console.error(`[JVMInterpreter] ${errorMsg}`);
+      
+      // Also check if method exists in superclass
+      if (javaClass.superClassName) {
+        console.log(`[JVMInterpreter] Superclass: ${javaClass.superClassName}`);
+      }
+      
+      throw new Error(errorMsg);
     }
 
     // Set up execution context
-    this.currentClass = javaClass;
+    this.currentClass = targetClass;
     this.currentMethod = method;
     
     // Set up locals with arguments
@@ -328,7 +407,7 @@ export class JVMInterpreter {
 
     // Execute bytecode
     try {
-      return this.executeBytecode(method.code, javaClass);
+      return this.executeBytecode(method.code, targetClass);
     } finally {
       this.currentClass = null;
       this.currentMethod = null;
@@ -391,72 +470,97 @@ export class JVMInterpreter {
    * Invoke a method
    */
   private invokeMethod(className: string, methodName: string, descriptor: string, objectRef: any, args: any[]): any {
-    // Check if method is native
-    const nativeBridge = getNativeMethodBridge();
-    if (nativeBridge.hasMethod(className, methodName)) {
-      return nativeBridge.invoke(className, methodName, descriptor, objectRef, ...args);
-    }
-    
-    const resolved = this.resolveMethod(className, methodName, descriptor);
-    if (!resolved) {
-      // Try native method as fallback
-      const nativeResult = nativeBridge.invoke(className, methodName, descriptor, objectRef, ...args);
-      if (nativeResult !== undefined) {
-        return nativeResult;
-      }
-      console.warn(`[JVMInterpreter] Method not found: ${className}.${methodName}${descriptor}`);
+    // Check call stack depth to prevent infinite recursion
+    if (this.callStack.length >= this.maxCallStackDepth) {
+      console.error(`[JVMInterpreter] Maximum call stack depth exceeded: ${this.maxCallStackDepth}`);
+      console.error(`[JVMInterpreter] Call stack:`, this.callStack.map(c => `${c.className}.${c.methodName}`).join(' -> '));
+      // Return undefined instead of throwing to prevent complete failure
       return undefined;
     }
     
-    const { class: javaClass, method } = resolved;
-    
-    // Check if method has no code (native or abstract)
-    if (!method.code || method.code.length === 0) {
-      // Try native method
-      const nativeResult = nativeBridge.invoke(className, methodName, descriptor, objectRef, ...args);
-      if (nativeResult !== undefined) {
-        return nativeResult;
-      }
-      console.warn(`[JVMInterpreter] Method has no code: ${className}.${methodName}${descriptor}`);
+    // Check for recursive calls - be more aggressive
+    const recursionCount = this.callStack.filter(c => c.className === className && c.methodName === methodName).length;
+    if (recursionCount > 5) {
+      console.warn(`[JVMInterpreter] Excessive recursion detected (${recursionCount} times): ${className}.${methodName}`);
+      console.warn(`[JVMInterpreter] Call stack:`, this.callStack.map(c => `${c.className}.${c.methodName}`).join(' -> '));
+      // Return undefined to break recursion
       return undefined;
     }
     
-    // Save current context
-    const savedClass = this.currentClass;
-    const savedMethod = this.currentMethod;
-    const savedLocals = this.locals;
-    const savedStack = this.stack;
+    // Push to call stack
+    this.callStack.push({ className, methodName });
     
     try {
-      // Set up new context
-      this.currentClass = javaClass;
-      this.currentMethod = method;
-      
-      // Set up locals
-      const maxLocals = method.maxLocals || method.parsedDescriptor?.parameters.length || args.length;
-      this.locals = new Array(maxLocals);
-      
-      // Set 'this' for instance methods
-      let localIndex = 0;
-      if (objectRef !== undefined && objectRef !== null) {
-        this.locals[localIndex++] = objectRef;
+      // Check if method is native
+      const nativeBridge = getNativeMethodBridge();
+      if (nativeBridge.hasMethod(className, methodName)) {
+        return nativeBridge.invoke(className, methodName, descriptor, objectRef, ...args);
       }
       
-      // Set arguments
-      for (let i = 0; i < args.length && localIndex < maxLocals; i++) {
-        this.locals[localIndex++] = args[i];
+      const resolved = this.resolveMethod(className, methodName, descriptor);
+      if (!resolved) {
+        // Try native method as fallback
+        const nativeResult = nativeBridge.invoke(className, methodName, descriptor, objectRef, ...args);
+        if (nativeResult !== undefined) {
+          return nativeResult;
+        }
+        console.warn(`[JVMInterpreter] Method not found: ${className}.${methodName}${descriptor}`);
+        return undefined;
       }
       
-      this.stack = [];
+      const { class: javaClass, method } = resolved;
       
-      // Execute method
-      return this.executeBytecode(method.code, javaClass);
+      // Check if method has no code (native or abstract)
+      if (!method.code || method.code.length === 0) {
+        // Try native method
+        const nativeResult = nativeBridge.invoke(className, methodName, descriptor, objectRef, ...args);
+        if (nativeResult !== undefined) {
+          return nativeResult;
+        }
+        console.warn(`[JVMInterpreter] Method has no code: ${className}.${methodName}${descriptor}`);
+        return undefined;
+      }
+      
+      // Save current context
+      const savedClass = this.currentClass;
+      const savedMethod = this.currentMethod;
+      const savedLocals = this.locals;
+      const savedStack = this.stack;
+      
+      try {
+        // Set up new context
+        this.currentClass = javaClass;
+        this.currentMethod = method;
+        
+        // Set up locals
+        const maxLocals = method.maxLocals || method.parsedDescriptor?.parameters.length || args.length;
+        this.locals = new Array(maxLocals);
+        
+        // Set 'this' for instance methods
+        let localIndex = 0;
+        if (objectRef !== undefined && objectRef !== null) {
+          this.locals[localIndex++] = objectRef;
+        }
+        
+        // Set arguments
+        for (let i = 0; i < args.length && localIndex < maxLocals; i++) {
+          this.locals[localIndex++] = args[i];
+        }
+        
+        this.stack = [];
+        
+        // Execute method
+        return this.executeBytecode(method.code, javaClass);
+      } finally {
+        // Restore context
+        this.currentClass = savedClass;
+        this.currentMethod = savedMethod;
+        this.locals = savedLocals;
+        this.stack = savedStack;
+      }
     } finally {
-      // Restore context
-      this.currentClass = savedClass;
-      this.currentMethod = savedMethod;
-      this.locals = savedLocals;
-      this.stack = savedStack;
+      // Pop from call stack
+      this.callStack.pop();
     }
   }
 
@@ -1444,16 +1548,30 @@ export class JVMInterpreter {
             if (resolver) {
               try {
                 const methodRef = resolver.getMethodRef(index);
-                const objectref = this.stack.pop();
                 
-                // Parse method descriptor to get argument count
-                const methodDesc = parseMethodDescriptor(methodRef.descriptor);
-                const args: any[] = [];
-                
-                // Pop arguments (in reverse order)
-                for (let i = methodDesc.parameters.length - 1; i >= 0; i--) {
-                  args.unshift(this.stack.pop());
+                // Parse method descriptor to get argument count BEFORE popping objectref
+                let methodDesc: MethodDescriptor;
+                try {
+                  methodDesc = parseMethodDescriptor(methodRef.descriptor);
+                } catch (e) {
+                  console.warn(`[JVMInterpreter] Failed to parse descriptor for invokevirtual: ${methodRef.descriptor}`, e);
+                  // Fallback: assume no parameters
+                  methodDesc = {
+                    parameters: [],
+                    returnType: { type: 'void' },
+                  };
                 }
+                
+                // Pop arguments first (in reverse order)
+                const args: any[] = [];
+                for (let i = methodDesc.parameters.length - 1; i >= 0; i--) {
+                  if (this.stack.length > 0) {
+                    args.unshift(this.stack.pop());
+                  }
+                }
+                
+                // Then pop objectref
+                const objectref = this.stack.length > 0 ? this.stack.pop() : null;
                 
                 // Get object's class name
                 let targetClassName = methodRef.className;
@@ -1468,10 +1586,7 @@ export class JVMInterpreter {
                 }
               } catch (e) {
                 console.warn(`[JVMInterpreter] invokevirtual failed:`, e);
-                // Pop objectref if still on stack
-                if (this.stack.length > 0) {
-                  this.stack.pop();
-                }
+                // Stack cleanup is already handled above
               }
             } else {
               // Fallback: pop objectref
@@ -1489,16 +1604,29 @@ export class JVMInterpreter {
             if (resolver) {
               try {
                 const methodRef = resolver.getMethodRef(index);
-                const objectref = this.stack.pop();
                 
-                // Parse method descriptor to get argument count
-                const methodDesc = parseMethodDescriptor(methodRef.descriptor);
-                const args: any[] = [];
-                
-                // Pop arguments (in reverse order)
-                for (let i = methodDesc.parameters.length - 1; i >= 0; i--) {
-                  args.unshift(this.stack.pop());
+                // Parse method descriptor to get argument count BEFORE popping objectref
+                let methodDesc: MethodDescriptor;
+                try {
+                  methodDesc = parseMethodDescriptor(methodRef.descriptor);
+                } catch (e) {
+                  console.warn(`[JVMInterpreter] Failed to parse descriptor for invokespecial: ${methodRef.descriptor}`, e);
+                  methodDesc = {
+                    parameters: [],
+                    returnType: { type: 'void' },
+                  };
                 }
+                
+                // Pop arguments first (in reverse order)
+                const args: any[] = [];
+                for (let i = methodDesc.parameters.length - 1; i >= 0; i--) {
+                  if (this.stack.length > 0) {
+                    args.unshift(this.stack.pop());
+                  }
+                }
+                
+                // Then pop objectref
+                const objectref = this.stack.length > 0 ? this.stack.pop() : null;
                 
                 // For invokespecial, use the class from the constant pool (not object's class)
                 const result = this.invokeMethod(methodRef.className, methodRef.methodName, methodRef.descriptor, objectref, args);
@@ -1507,10 +1635,7 @@ export class JVMInterpreter {
                 }
               } catch (e) {
                 console.warn(`[JVMInterpreter] invokespecial failed:`, e);
-                // Pop objectref if still on stack
-                if (this.stack.length > 0) {
-                  this.stack.pop();
-                }
+                // Stack cleanup is already handled above
               }
             } else {
               // Fallback: pop objectref
@@ -1559,16 +1684,29 @@ export class JVMInterpreter {
             if (resolver) {
               try {
                 const methodRef = resolver.getInterfaceMethodRef(index);
-                const objectref = this.stack.pop();
                 
-                // Parse method descriptor to get argument count
-                const methodDesc = parseMethodDescriptor(methodRef.descriptor);
-                const args: any[] = [];
-                
-                // Pop arguments (in reverse order)
-                for (let i = methodDesc.parameters.length - 1; i >= 0; i--) {
-                  args.unshift(this.stack.pop());
+                // Parse method descriptor to get argument count BEFORE popping objectref
+                let methodDesc: MethodDescriptor;
+                try {
+                  methodDesc = parseMethodDescriptor(methodRef.descriptor);
+                } catch (e) {
+                  console.warn(`[JVMInterpreter] Failed to parse descriptor for invokeinterface: ${methodRef.descriptor}`, e);
+                  methodDesc = {
+                    parameters: [],
+                    returnType: { type: 'void' },
+                  };
                 }
+                
+                // Pop arguments first (in reverse order)
+                const args: any[] = [];
+                for (let i = methodDesc.parameters.length - 1; i >= 0; i--) {
+                  if (this.stack.length > 0) {
+                    args.unshift(this.stack.pop());
+                  }
+                }
+                
+                // Then pop objectref
+                const objectref = this.stack.length > 0 ? this.stack.pop() : null;
                 
                 // Get object's class name
                 let targetClassName = methodRef.className;
@@ -1583,10 +1721,7 @@ export class JVMInterpreter {
                 }
               } catch (e) {
                 console.warn(`[JVMInterpreter] invokeinterface failed:`, e);
-                // Pop objectref if still on stack
-                if (this.stack.length > 0) {
-                  this.stack.pop();
-                }
+                // Stack cleanup is already handled above
               }
             } else {
               // Fallback: pop objectref

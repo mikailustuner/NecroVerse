@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Amiron Desktop - NecroNet</title>
+  <meta name="description" content="AmigaOS-inspired desktop environment resurrected for the web">
+  <link rel="icon" type="image/svg+xml" href="/icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      background: #0a0612;
+      overflow: hidden;
+      font-family: 'Orbitron', monospace;
+    }
+    
+    #canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+    }
+    
+    #portal-nav {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 1000;
+      display: flex;
+      gap: 10px;
+    }
+    
+    .portal-btn {
+      background: rgba(168, 85, 247, 0.2);
+      border: 2px solid #a855f7;
+      color: #a855f7;
+      padding: 8px 16px;
+      font-family: 'Orbitron', monospace;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+      box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
+    }
+    
+    .portal-btn:hover {
+      background: rgba(168, 85, 247, 0.4);
+      box-shadow: 0 0 20px rgba(168, 85, 247, 0.6);
+      transform: translateY(-2px);
+    }
+    
+    .portal-btn.home {
+      border-color: #ff006e;
+      color: #ff006e;
+      text-shadow: 0 0 10px rgba(255, 0, 110, 0.5);
+      box-shadow: 0 0 10px rgba(255, 0, 110, 0.3);
+    }
+    
+    .portal-btn.home:hover {
+      background: rgba(255, 0, 110, 0.2);
+      box-shadow: 0 0 20px rgba(255, 0, 110, 0.6);
+    }
+  </style>
+</head>
+<body>
+  <div id="portal-nav">
+    <button class="portal-btn home" onclick="window.location.href='http://localhost:3001'">
+      ☠️ NecroVerse
+    </button>
+    <button class="portal-btn" onclick="window.location.href='http://localhost:3001/lab'">
+      🧠 NecroDev
+    </button>
+    <button class="portal-btn" onclick="window.location.href='http://localhost:3002'">
+      💀 NecroPlay
+    </button>
+  </div>
+  <canvas id="canvas"></canvas>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

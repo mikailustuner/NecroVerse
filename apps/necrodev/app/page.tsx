@@ -89,6 +89,17 @@ export default function HomePage() {
         bloodMode ? "blood-mode" : ""
       }`}
     >
+      {/* Documentation button */}
+      <div className="absolute top-8 right-8 z-50">
+        <Button
+          variant="violet"
+          onClick={() => (window.location.href = "http://localhost:3002/docs")}
+          className="gap-2"
+        >
+          📚 Docs
+        </Button>
+      </div>
+
       {/* Data veins background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {[...Array(5)].map((_, i) => (
@@ -143,14 +154,24 @@ export default function HomePage() {
             onClick={() => router.push("/lab")}
             className="text-lg px-8 py-4"
           >
-            🧠 Enter NecroDev (Resurrection Lab)
+            🧠 NecroDev
+            <span className="block text-xs opacity-70">Resurrection Lab</span>
           </Button>
           <Button
             variant="cyan"
             onClick={() => (window.location.href = "http://localhost:3002")}
             className="text-lg px-8 py-4"
           >
-            💀 Enter NecroPlay (Graveyard Arcade)
+            💀 NecroPlay
+            <span className="block text-xs opacity-70">Graveyard Arcade</span>
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={() => (window.location.href = "http://localhost:3003")}
+            className="text-lg px-8 py-4 border-2 border-purple-500"
+          >
+            ☠️ Amiron Desktop
+            <span className="block text-xs opacity-70">OS Realm</span>
           </Button>
         </motion.div>
       </motion.div>

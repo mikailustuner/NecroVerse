@@ -58,8 +58,48 @@ export class Applet extends Panel {
    * Paint applet
    */
   paint(g: Graphics): void {
-    // Default: paint background and children
-    super.paint(g);
+    // Prevent repaint during paint to avoid infinite loop
+    const wasRepaintRequested = this.isRepaintRequested();
+    if (wasRepaintRequested) {
+      // Temporarily clear repaint flag
+      (this as any).repaintRequested = false;
+    }
+    
+    try {
+      // Default: paint background
+      if (this.background) {
+        g.setColor(this.background);
+        g.fillRect(0, 0, this.width, this.height);
+      } else {
+        // Default gray background
+        g.setColor({ r: 192, g: 192, b: 192, a: 1 });
+        g.fillRect(0, 0, this.width, this.height);
+      }
+      
+      // Paint children
+      super.paint(g);
+      
+      // If no children and no custom paint, show a message
+      if (this.getComponentCount() === 0) {
+        g.setColor({ r: 0, g: 0, b: 0, a: 1 });
+        g.setFont({ name: "Arial", size: 16, style: 0 });
+        g.drawString("Java MIDlet Runtime", 10, 30);
+        g.drawString(`Size: ${this.width}x${this.height}`, 10, 55);
+        g.drawString("MIDlet started successfully", 10, 80);
+        
+        // Draw a test rectangle to verify rendering
+        g.setColor({ r: 168, g: 85, b: 247, a: 1 }); // Purple
+        g.fillRect(10, 100, 200, 100);
+        
+        g.setColor({ r: 255, g: 255, b: 255, a: 1 }); // White
+        g.drawString("Test Rectangle", 20, 140);
+      }
+    } finally {
+      // Restore repaint flag if it was set
+      if (wasRepaintRequested) {
+        (this as any).repaintRequested = true;
+      }
+    }
   }
 
   /**

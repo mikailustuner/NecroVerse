@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "module": "ESNext",
+    "target": "ESNext",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"]
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"],
+  "references": [
+    { "path": "../../packages/amiron-pal" },
+    { "path": "../../packages/amiron-intuition" },
+    { "path": "../../packages/amiron-workbench" },
+    { "path": "../../packages/amiron-ritual-api" }
+  ]
+}

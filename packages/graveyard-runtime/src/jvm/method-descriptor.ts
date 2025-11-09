@@ -26,11 +26,15 @@ export interface JavaType {
  * Parse Java method descriptor
  */
 export function parseMethodDescriptor(descriptor: string): MethodDescriptor {
+  if (!descriptor || descriptor.length === 0) {
+    throw new Error(`Invalid method descriptor: empty string`);
+  }
+  
   let index = 0;
   
   // Must start with '('
   if (descriptor[index] !== '(') {
-    throw new Error(`Invalid method descriptor: expected '(', got '${descriptor[index]}'`);
+    throw new Error(`Invalid method descriptor: expected '(', got '${descriptor[index] || 'end of string'}' (descriptor: "${descriptor}")`);
   }
   index++;
   

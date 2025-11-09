@@ -56,9 +56,20 @@ export default function PlayPage() {
   }, [fileId]);
 
   useEffect(() => {
+    let runtimeInstance: any = null;
+    
     if (file && containerRef) {
-      initializeRuntime();
+      initializeRuntime().then((instance) => {
+        runtimeInstance = instance;
+      });
     }
+    
+    // Cleanup on unmount
+    return () => {
+      if (runtimeInstance && typeof runtimeInstance.destroy === 'function') {
+        runtimeInstance.destroy();
+      }
+    };
   }, [file, containerRef]);
 
   const loadFile = async () => {
@@ -105,10 +116,10 @@ export default function PlayPage() {
     }
   };
 
-  const initializeRuntime = async () => {
+  const initializeRuntime = async (): Promise<any> => {
     if (!file || !containerRef) {
       console.warn("[PlayPage] Cannot initialize runtime: file or containerRef missing", { file, containerRef });
-      return;
+      return null;
     }
 
     console.log("[PlayPage] Initializing runtime for file:", file.name, "type:", file.type);
@@ -148,30 +159,35 @@ export default function PlayPage() {
 
     try {
       console.log("[PlayPage] Creating runtime for type:", file.type.toLowerCase());
+      let runtimeInstance: any = null;
+      
       switch (file.type.toLowerCase()) {
         case "swf":
           // Use custom SWF runtime
           console.log("[PlayPage] Creating SWF runtime...");
-          createSWFRuntime("runtime-container", config);
+          runtimeInstance = createSWFRuntime("runtime-container", config);
           console.log("[PlayPage] SWF runtime created");
           break;
         case "jar":
-          // Use custom JAR runtime
-          createJARRuntime("runtime-container", config);
+          // Use CheerpJ runtime for better compatibility
+          const { createCheerpJRuntime } = await import("@graveyard-runtime/runtime");
+          runtimeInstance = createCheerpJRuntime("runtime-container", config);
           break;
         case "xap":
           // Use custom XAP runtime
-          createXAPRuntime("runtime-container", config);
+          runtimeInstance = createXAPRuntime("runtime-container", config);
           break;
         case "dcr":
           // Use custom DCR runtime
-          createDCRRuntime("runtime-container", config);
+          runtimeInstance = createDCRRuntime("runtime-container", config);
           break;
         default:
           // Fallback to canvas runtime
-          createCanvasRuntime("runtime-container", config);
+          runtimeInstance = createCanvasRuntime("runtime-container", config);
           break;
       }
+      
+      return runtimeInstance;
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
       setRuntimeError(err);

@@ -1,0 +1,24 @@
+{
+  "name": "@amiron/workbench",
+  "version": "0.1.0",
+  "description": "Amiron Workbench Desktop Shell",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf dist",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@amiron/pal": "workspace:*",
+    "@amiron/intuition": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "rimraf": "^5.0.5"
+  }
+}

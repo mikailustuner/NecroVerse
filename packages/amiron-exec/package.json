@@ -1,0 +1,20 @@
+{
+  "name": "@amiron/exec",
+  "version": "0.1.0",
+  "description": "Amiron Exec Layer - WebAssembly task management",
+  "type": "module",
+  "main": "./pkg/amiron_exec.js",
+  "types": "./pkg/amiron_exec.d.ts",
+  "files": [
+    "pkg"
+  ],
+  "scripts": {
+    "build": "echo \"Using mock TypeScript implementation. Install Rust + wasm-pack for WASM build.\"",
+    "build:wasm": "wasm-pack build --target web --out-dir pkg",
+    "build:release": "wasm-pack build --target web --out-dir pkg --release",
+    "clean": "rimraf pkg target"
+  },
+  "devDependencies": {
+    "rimraf": "^5.0.5"
+  }
+}

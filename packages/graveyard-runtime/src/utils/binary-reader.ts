@@ -31,6 +31,11 @@ export class BinaryReader {
     return this.length - offsetBytes;
   }
 
+  available(): number {
+    // Alias for remaining
+    return this.remaining;
+  }
+
   readUint8(): number {
     // Convert bit offset to byte offset
     const byteOffset = Math.floor(this.offset / 8);

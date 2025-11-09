@@ -103,7 +103,7 @@ export function Comments({ fileId, className = "" }: CommentsProps) {
         <Button
           onClick={handleAddComment}
           disabled={!newComment.trim()}
-          variant="primary"
+          variant="violet"
           className="w-full py-2"
         >
           Add Comment

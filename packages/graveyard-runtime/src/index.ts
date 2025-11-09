@@ -4,6 +4,7 @@ export * from "./converters";
 export * from "./runtime";
 export * from "./parsers";
 export * from "./engines";
+export * from "./midp";
 export * from "./renderers";
 export * from "./utils/logger";
 export * from "./ai/format-detector";

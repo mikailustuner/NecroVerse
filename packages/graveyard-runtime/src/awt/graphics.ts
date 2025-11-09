@@ -67,8 +67,11 @@ export class Graphics {
     } else {
       this.color = color;
     }
-    this.ctx.fillStyle = this.colorToCSS();
-    this.ctx.strokeStyle = this.colorToCSS();
+    
+    // Convert color to CSS string
+    const cssColor = `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.color.a})`;
+    this.ctx.fillStyle = cssColor;
+    this.ctx.strokeStyle = cssColor;
   }
 
   /**

@@ -33,50 +33,47 @@ export abstract class Component {
    * Update component (called before paint)
    */
   update(g: Graphics): void {
-    this.paint(g);
+    // Prevent repaint during update/paint
+    const wasRepaintRequested = this.isRepaintRequested();
+    if (wasRepaintRequested) {
+      (this as any).repaintRequested = false;
+    }
+    
+    try {
+      this.paint(g);
+    } finally {
+      if (wasRepaintRequested) {
+        (this as any).repaintRequested = true;
+      }
+    }
+  }
+
+  /**
+   * Internal repaint implementation
+   */
+  private doRepaint(): void {
+    // Simply set the flag - external rendering loop will handle the actual paint
+    this.repaintRequested = true;
   }
 
   /**
    * Repaint component
    */
-  repaint(): void {
-    this.repaintRequested = true;
-    if (this.repaintTimer === null) {
-      this.repaintTimer = requestAnimationFrame(() => {
-        this.repaintRequested = false;
-        this.repaintTimer = null;
-        if (this.parent) {
-          this.parent.repaint();
-        }
-      });
-    }
-  }
-
-  /**
-   * Repaint with delay
-   */
+  repaint(): void;
   repaint(delay: number): void;
   repaint(x: number, y: number, width: number, height: number): void;
   repaint(xOrDelay?: number, y?: number, width?: number, height?: number): void {
     if (y !== undefined && width !== undefined && height !== undefined) {
-      // Repaint specific rectangle
+      // Repaint specific rectangle - just set flag
       this.repaintRequested = true;
-      if (this.repaintTimer === null) {
-        this.repaintTimer = requestAnimationFrame(() => {
-          this.repaintRequested = false;
-          this.repaintTimer = null;
-          if (this.parent) {
-            this.parent.repaint();
-          }
-        });
-      }
-    } else if (xOrDelay !== undefined) {
+    } else if (xOrDelay !== undefined && xOrDelay > 0) {
       // Repaint with delay
       setTimeout(() => {
-        this.repaint();
+        this.repaintRequested = true;
       }, xOrDelay);
     } else {
-      this.repaint();
+      // No parameters - immediate repaint request
+      this.repaintRequested = true;
     }
   }
 
@@ -220,6 +217,13 @@ export abstract class Component {
   isRepaintRequested(): boolean {
     return this.repaintRequested;
   }
+
+  /**
+   * Request repaint
+   */
+  requestRepaint(): void {
+    this.repaint();
+  }
 }
 
 /**
@@ -312,20 +316,32 @@ export class Container extends Component {
    * Paint container and children
    */
   paint(g: Graphics): void {
-    // Paint background
-    if (this.background) {
-      g.setColor(this.background);
-      g.fillRect(0, 0, this.width, this.height);
+    // Prevent repaint during paint
+    const wasRepaintRequested = this.isRepaintRequested();
+    if (wasRepaintRequested) {
+      (this as any).repaintRequested = false;
     }
+    
+    try {
+      // Paint background
+      if (this.background) {
+        g.setColor(this.background);
+        g.fillRect(0, 0, this.width, this.height);
+      }
 
-    // Paint children
-    for (const child of this.children) {
-      if (child.visible) {
-        g.save();
-        g.translate(child.x, child.y);
-        g.setClip(0, 0, child.width, child.height);
-        child.paint(g);
-        g.restore();
+      // Paint children
+      for (const child of this.children) {
+        if (child.visible) {
+          g.save();
+          g.translate(child.x, child.y);
+          g.setClip(0, 0, child.width, child.height);
+          child.paint(g);
+          g.restore();
+        }
+      }
+    } finally {
+      if (wasRepaintRequested) {
+        (this as any).repaintRequested = true;
       }
     }
   }
@@ -334,20 +350,32 @@ export class Container extends Component {
    * Update container and children
    */
   update(g: Graphics): void {
-    // Update background
-    if (this.background) {
-      g.setColor(this.background);
-      g.fillRect(0, 0, this.width, this.height);
+    // Prevent repaint during update
+    const wasRepaintRequested = this.isRepaintRequested();
+    if (wasRepaintRequested) {
+      (this as any).repaintRequested = false;
     }
+    
+    try {
+      // Update background
+      if (this.background) {
+        g.setColor(this.background);
+        g.fillRect(0, 0, this.width, this.height);
+      }
 
-    // Update children
-    for (const child of this.children) {
-      if (child.visible) {
-        g.save();
-        g.translate(child.x, child.y);
-        g.setClip(0, 0, child.width, child.height);
-        child.update(g);
-        g.restore();
+      // Update children
+      for (const child of this.children) {
+        if (child.visible) {
+          g.save();
+          g.translate(child.x, child.y);
+          g.setClip(0, 0, child.width, child.height);
+          child.update(g);
+          g.restore();
+        }
+      }
+    } finally {
+      if (wasRepaintRequested) {
+        (this as any).repaintRequested = true;
       }
     }
   }
@@ -393,5 +421,7 @@ export interface LayoutManager {
 }
 
 // Export LayoutManager from layout.ts
-export { LayoutManager as LayoutManagerImpl } from "./layout";
+export type { LayoutManager } from "./layout";
+// Re-export as LayoutManagerImpl for compatibility
+export type { LayoutManager as LayoutManagerImpl } from "./layout";
 

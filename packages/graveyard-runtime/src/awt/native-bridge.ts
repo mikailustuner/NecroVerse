@@ -5,6 +5,8 @@
 
 import { Graphics } from "./graphics";
 import { Component } from "./component";
+import { Display } from "../midp/display";
+import { Canvas } from "../midp/canvas";
 
 /**
  * Native method registry
@@ -86,6 +88,28 @@ export class NativeMethodBridge {
     });
     this.register("java/awt/Component.update", (comp: Component, g: Graphics) => {
       comp.update(g);
+    });
+
+    // javax.microedition.lcdui.Display
+    this.register("javax/microedition/lcdui/Display.getDisplay", (midlet: any) => {
+      return Display.getDisplay(midlet);
+    });
+    this.register("javax/microedition/lcdui/Display.setCurrent", (display: Display, displayable: any) => {
+      display.setCurrent(displayable);
+    });
+    this.register("javax/microedition/lcdui/Display.getCurrent", (display: Display) => {
+      return display.getCurrent();
+    });
+
+    // javax.microedition.lcdui.Canvas
+    this.register("javax/microedition/lcdui/Canvas.getWidth", (canvas: Canvas) => {
+      return canvas.getWidth();
+    });
+    this.register("javax/microedition/lcdui/Canvas.getHeight", (canvas: Canvas) => {
+      return canvas.getHeight();
+    });
+    this.register("javax/microedition/lcdui/Canvas.repaint", (canvas: Canvas) => {
+      canvas.repaint();
     });
 
     // java.awt.Graphics

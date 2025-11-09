@@ -95,7 +95,7 @@ export function VersionHistory({ fileId, className = "" }: VersionHistoryProps) 
                   </div>
                   <Button
                     onClick={() => window.open(version.url, "_blank")}
-                    variant="secondary"
+                    variant="cyan"
                     className="px-3 py-1 text-xs"
                   >
                     View

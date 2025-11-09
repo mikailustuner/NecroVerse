@@ -21,10 +21,15 @@
     ],
     "paths": {
       "@graveyard-runtime/*": ["./packages/graveyard-runtime/src/*"],
-      "@ui/*": ["./packages/ui/src/*"]
+      "@ui/*": ["./packages/ui/src/*"],
+      "@amiron/pal": ["./packages/amiron-pal/src/index.ts"],
+      "@amiron/intuition": ["./packages/amiron-intuition/src/index.ts"],
+      "@amiron/workbench": ["./packages/amiron-workbench/src/index.ts"],
+      "@amiron/ritual-api": ["./packages/amiron-ritual-api/src/index.ts"],
+      "@amiron/exec": ["./packages/amiron-exec/pkg/amiron_exec.d.ts"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "**/pkg/**", "**/dist/**", "**/target/**"]
 }
 

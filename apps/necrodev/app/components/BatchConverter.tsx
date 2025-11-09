@@ -88,7 +88,7 @@ export function BatchConverter({ onConvert, className = "" }: BatchConverterProp
                 </div>
                 <Button
                   onClick={() => handleRemoveFile(index)}
-                  variant="secondary"
+                  variant="magenta"
                   className="px-2 py-1 text-xs ml-2"
                 >
                   Remove
@@ -120,7 +120,7 @@ export function BatchConverter({ onConvert, className = "" }: BatchConverterProp
         <Button
           onClick={handleConvert}
           disabled={files.length === 0 || converting}
-          variant="primary"
+          variant="violet"
           className="w-full py-2"
         >
           {converting ? `Converting... ${files.length} files` : `Convert ${files.length} Files`}

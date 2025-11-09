@@ -1,4 +1,4 @@
-export type FileType = "swf" | "jar" | "xap" | "dcr" | "exe" | "dll" | "ocx" | "wasm" | "webgl" | "unknown";
+export type FileType = "swf" | "jar" | "xap" | "dcr" | "exe" | "dll" | "ocx" | "wasm" | "webgl" | "av1" | "unknown";
 
 export interface FileMetadata {
   name: string;
