@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "buildCommand": "cd ../.. && pnpm run build:vercel",
-  "installCommand": "cd ../.. && pnpm install",
+  "buildCommand": "pnpm run build:vercel",
+  "installCommand": "pnpm install",
   "framework": "nextjs",
-  "rootDirectory": "apps/necrodev"
+  "outputDirectory": "apps/necrodev/.next"
 }
 
