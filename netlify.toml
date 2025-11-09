@@ -24,15 +24,14 @@
 # /necroplay/* -> necroplay uygulamasına yönlendir
 # Necroplay basePath ile /necroplay prefix'i eklenmiş, bu yüzden direkt olarak çalışır
 # Not: Necroplay build output'u necrodev build output'una merge edilmiş olacak
+# Next.js plugin sadece necrodev'i serve ediyor, bu yüzden necroplay için redirects yeterli
 [[redirects]]
   from = "/necroplay"
   to = "/necroplay/"
   status = 200
-  force = true
 
-# Necroplay için tüm path'leri yönlendir
+# Necroplay için tüm path'leri yönlendir (force olmadan, Next.js plugin handle etsin)
 [[redirects]]
   from = "/necroplay/*"
   to = "/necroplay/:splat"
   status = 200
-  force = true
