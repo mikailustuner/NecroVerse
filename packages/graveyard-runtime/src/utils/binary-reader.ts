@@ -6,7 +6,7 @@ export class BinaryReader {
   private offset: number;
   private littleEndian: boolean;
 
-  constructor(buffer: ArrayBuffer, littleEndian: boolean = false) {
+  constructor(buffer: ArrayBufferLike, littleEndian: boolean = false) {
     this.view = new DataView(buffer);
     this.offset = 0;
     this.littleEndian = littleEndian;
