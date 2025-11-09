@@ -1,4 +1,4 @@
-import { Window, globalAnimationManager } from '@amiron/intuition';
+import { Window, globalAnimationManager, InputEvent } from '@amiron/intuition';
 import { GraphicsContext, Point, Rect } from '@amiron/pal';
 import { NecroTheme } from '@amiron/intuition';
 import { Icon } from './icon';
@@ -49,17 +49,12 @@ export class Desktop {
   }
   
   openWindow(window: Window): void {
-    console.log('🪟 openWindow called with:', window);
-    console.log('🔍 Type check:', typeof window, window?.constructor?.name);
-    console.log('🔍 Has render?', typeof window?.render);
-    
     if (!window || typeof window.render !== 'function') {
       console.error('❌ REJECTED: Invalid window object!', window);
       return;
     }
     
     this.windows.push(window);
-    console.log('✅ Window added to array. Total windows:', this.windows.length);
     this.focusWindow(window);
     
     // Start fade-in animation
@@ -125,8 +120,8 @@ export class Desktop {
       return true;
     });
     
-    for (const window of this.windows) {
-      window.render(ctx);
+    for (const win of this.windows) {
+      win.render(ctx);
     }
   }
   
@@ -173,17 +168,10 @@ export class Desktop {
   }
   
   private async launchIcon(icon: Icon): Promise<void> {
-    console.log('🔮 Launching application:', icon.target);
-    
     // Try synchronous registry first (for pre-loaded apps)
     const appModule = this.applicationRegistry.get(icon.target);
     if (appModule) {
-      console.log('📦 Found in registry, invoking module...');
       const window = appModule();
-      console.log('🪟 Window created:', window);
-      console.log('🔍 Window type:', typeof window);
-      console.log('🔍 Has render?', typeof window?.render);
-      console.log('🔍 Window constructor:', window?.constructor?.name);
       
       if (window && typeof window.render === 'function') {
         this.openWindow(window);
@@ -228,7 +216,7 @@ export class Desktop {
     }
   }
   
-  handleMouseDown(pos: Point): void {
+  handleMouseDown(pos: Point, button?: number): void {
     // Check windows in reverse order (top to bottom)
     for (let i = this.windows.length - 1; i >= 0; i--) {
       const window = this.windows[i];
@@ -253,9 +241,20 @@ export class Desktop {
       }
       
       if (this.windowContainsPoint(window, pos)) {
-        // Focus window on click
+        // Focus window first
         this.focusWindow(window);
-        return;
+        
+        // Send event to window (which will forward to widgets)
+        const event: InputEvent = {
+          type: 'mousedown',
+          position: pos,
+          button: button || 0,
+        };
+        
+        if (window.handleEvent(event)) {
+          // Window/widget handled the event
+          return;
+        }
       }
     }
   }
@@ -265,11 +264,126 @@ export class Desktop {
       const { window, offset } = this.windowDragState;
       window.bounds.x = pos.x - offset.x;
       window.bounds.y = pos.y - offset.y;
+      return;
+    }
+    
+    // Send mousemove event to windows (for hover effects, etc.)
+    for (let i = this.windows.length - 1; i >= 0; i--) {
+      const window = this.windows[i];
+      
+      if (!window || !window.bounds) {
+        continue;
+      }
+      
+      if (this.windowContainsPoint(window, pos)) {
+        const event: InputEvent = {
+          type: 'mousemove',
+          position: pos,
+        };
+        
+        if (window.handleEvent(event)) {
+          return;
+        }
+      }
     }
   }
   
-  handleMouseUp(): void {
-    this.windowDragState = null;
+  handleMouseUp(pos: Point, button?: number): void {
+    if (this.windowDragState) {
+      this.windowDragState = null;
+      return;
+    }
+    
+    // Send mouseup event to windows
+    for (let i = this.windows.length - 1; i >= 0; i--) {
+      const window = this.windows[i];
+      
+      if (!window || !window.bounds) {
+        continue;
+      }
+      
+      if (this.windowContainsPoint(window, pos)) {
+        const event: InputEvent = {
+          type: 'mouseup',
+          position: pos,
+          button: button || 0,
+        };
+        
+        if (window.handleEvent(event)) {
+          return;
+        }
+      }
+    }
+  }
+  
+  handleClick(pos: Point, button?: number): void {
+    // Check windows in reverse order (top to bottom)
+    for (let i = this.windows.length - 1; i >= 0; i--) {
+      const window = this.windows[i];
+      
+      if (!window || !window.bounds) {
+        continue;
+      }
+      
+      if (this.windowContainsPoint(window, pos)) {
+        // Focus window first
+        this.focusWindow(window);
+        
+        // Send click event to window (which will forward to widgets)
+        const event: InputEvent = {
+          type: 'click',
+          position: pos,
+          button: button || 0,
+        };
+        
+        if (window.handleEvent(event)) {
+          // Window/widget handled the event
+          return;
+        }
+      }
+    }
+  }
+  
+  handleKeyDown(key: string): void {
+    // Send keydown event to focused window
+    for (let i = this.windows.length - 1; i >= 0; i--) {
+      const window = this.windows[i];
+      
+      if (!window || !window.bounds || !window.focused) {
+        continue;
+      }
+      
+      const event: InputEvent = {
+        type: 'keydown',
+        position: { x: 0, y: 0 }, // Not used for keyboard events
+        key,
+      };
+      
+      if (window.handleEvent(event)) {
+        return;
+      }
+    }
+  }
+  
+  handleKeyUp(key: string): void {
+    // Send keyup event to focused window
+    for (let i = this.windows.length - 1; i >= 0; i--) {
+      const window = this.windows[i];
+      
+      if (!window || !window.bounds || !window.focused) {
+        continue;
+      }
+      
+      const event: InputEvent = {
+        type: 'keyup',
+        position: { x: 0, y: 0 }, // Not used for keyboard events
+        key,
+      };
+      
+      if (window.handleEvent(event)) {
+        return;
+      }
+    }
   }
   
   private isInTitleBar(window: Window, point: Point): boolean {

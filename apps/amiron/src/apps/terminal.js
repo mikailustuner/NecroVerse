@@ -238,5 +238,6 @@ export class Terminal {
  * Launch the terminal application
  */
 export function launchTerminal() {
-    return new Terminal();
+    const terminal = new Terminal();
+    return terminal.getWindow();
 }

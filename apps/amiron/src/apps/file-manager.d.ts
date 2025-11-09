@@ -62,5 +62,5 @@ export declare class FileManager {
 /**
  * Launch the file manager application
  */
-export declare function launchFileManager(): FileManager;
+export declare function launchFileManager(): Window;
 //# sourceMappingURL=file-manager.d.ts.map

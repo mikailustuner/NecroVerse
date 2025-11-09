@@ -15,7 +15,7 @@ export class TextEditor {
     // Create window
     this.window = Amiron.createWindow('Text Editor', 100, 100, 600, 400);
     
-    // Create menu bar
+    // Create menu bar (relative to window: title bar is 24px, so menu bar starts at y: 24)
     const menus: Menu[] = [
       {
         label: 'File',
@@ -28,13 +28,13 @@ export class TextEditor {
     ];
     
     this.menuBar = new MenuBar(
-      { x: 100, y: 124, width: 600, height: 24 },
+      { x: 0, y: 24, width: 600, height: 24 },
       menus
     );
     
-    // Create text area
+    // Create text area (relative to window: title bar 24px + menu bar 24px = 48px)
     this.textArea = new TextArea(
-      { x: 100, y: 148, width: 600, height: 352 },
+      { x: 0, y: 48, width: 600, height: 352 },
       ''
     );
     

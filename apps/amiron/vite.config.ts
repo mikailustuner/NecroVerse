@@ -53,6 +53,7 @@ export default defineConfig({
       '@amiron/ritual-api',
       '@amiron/workbench',
     ],
+    force: true, // Force re-optimization on every dev server start
   },
   
   // Base path for deployment (can be overridden via env var)

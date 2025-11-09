@@ -1,4 +1,5 @@
-import { Amiron, TextArea, MenuBar } from '@amiron/ritual-api';
+import { Amiron } from '@amiron/ritual-api';
+import { TextArea, MenuBar } from '@amiron/intuition';
 /**
  * Text Editor Application
  * A simple text editor with file open/save capabilities
@@ -91,5 +92,6 @@ export class TextEditor {
  * Launch the text editor application
  */
 export function launchTextEditor() {
-    return new TextEditor();
+    const editor = new TextEditor();
+    return editor.getWindow();
 }

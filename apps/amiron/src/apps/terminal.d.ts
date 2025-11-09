@@ -56,5 +56,5 @@ export declare class Terminal {
 /**
  * Launch the terminal application
  */
-export declare function launchTerminal(): Terminal;
+export declare function launchTerminal(): Window;
 //# sourceMappingURL=terminal.d.ts.map

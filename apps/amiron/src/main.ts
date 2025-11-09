@@ -1,6 +1,7 @@
 import { CanvasGraphics, IndexedDBFileSystem, WebAudioContext } from '@amiron/pal';
 import { Desktop } from '@amiron/workbench';
 import { Amiron, Window } from '@amiron/ritual-api';
+import { globalAnimationManager } from '@amiron/intuition';
 import init, { Exec } from '@amiron/exec';
 import { launchTextEditor, launchFileManager, launchTerminal } from './apps';
 
@@ -99,7 +100,7 @@ async function bootstrap() {
       x: e.clientX - rect.left,
       y: e.clientY - rect.top,
     };
-    desktop.handleMouseDown(pos);
+    desktop.handleMouseDown(pos, e.button);
   });
   
   canvas.addEventListener('mousemove', (e) => {
@@ -111,8 +112,13 @@ async function bootstrap() {
     desktop.handleMouseMove(pos);
   });
   
-  canvas.addEventListener('mouseup', () => {
-    desktop.handleMouseUp();
+  canvas.addEventListener('mouseup', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const pos = {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    };
+    desktop.handleMouseUp(pos, e.button);
   });
   
   canvas.addEventListener('click', (e) => {
@@ -136,7 +142,22 @@ async function bootstrap() {
     } else {
       lastClickTime = now;
       lastClickPos = pos;
+      // Single click - send to desktop for widget interaction
+      desktop.handleClick(pos, e.button);
     }
+  });
+  
+  // Keyboard event handlers
+  window.addEventListener('keydown', (e) => {
+    // Prevent default browser behavior for certain keys
+    if (e.key === 'Tab' || e.key === 'F5') {
+      e.preventDefault();
+    }
+    desktop.handleKeyDown(e.key);
+  });
+  
+  window.addEventListener('keyup', (e) => {
+    desktop.handleKeyUp(e.key);
   });
   
   // Start render loop
@@ -153,6 +174,9 @@ async function bootstrap() {
       frameCount = 0;
       lastFrameTime = currentTime;
     }
+    
+    // Update animations (for window fade-in, glow effects, etc.)
+    globalAnimationManager.update();
     
     // Render desktop
     desktop.render(graphics);

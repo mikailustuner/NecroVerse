@@ -65,8 +65,21 @@ export class Window {
     
     this.drawBorder(ctx, this.bounds, theme.shadow);
     
+    // Render widgets with bounds offset by window position
     for (const widget of this.widgets) {
+      // Temporarily offset widget bounds for rendering
+      const originalBounds = widget.bounds;
+      widget.bounds = {
+        x: originalBounds.x + this.bounds.x,
+        y: originalBounds.y + this.bounds.y,
+        width: originalBounds.width,
+        height: originalBounds.height,
+      };
+      
       widget.render(ctx);
+      
+      // Restore original bounds
+      widget.bounds = originalBounds;
     }
     
     // Reset opacity
@@ -97,12 +110,35 @@ export class Window {
   }
   
   handleEvent(event: InputEvent): boolean {
+    // For keyboard events, skip position check
+    if (event.type === 'keydown' || event.type === 'keyup') {
+      // Forward keyboard events to all widgets
+      for (const widget of this.widgets) {
+        if (widget.handleEvent(event)) {
+          return true;
+        }
+      }
+      return false;
+    }
+    
+    // For mouse events, check if point is in window
     if (!this.containsPoint(event.position)) {
       return false;
     }
     
-    for (const widget of this.widgets) {
-      if (widget.handleEvent(event)) {
+    // Convert absolute position to relative position for widgets
+    const relativeEvent: InputEvent = {
+      ...event,
+      position: {
+        x: event.position.x - this.bounds.x,
+        y: event.position.y - this.bounds.y,
+      },
+    };
+    
+    // Forward event to widgets in reverse order (top to bottom)
+    for (let i = this.widgets.length - 1; i >= 0; i--) {
+      const widget = this.widgets[i];
+      if (widget.handleEvent(relativeEvent)) {
         return true;
       }
     }

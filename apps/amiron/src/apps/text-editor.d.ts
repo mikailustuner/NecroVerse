@@ -1,4 +1,4 @@
-import { Window } from '@amiron/ritual-api';
+import { Window } from '@amiron/intuition';
 /**
  * Text Editor Application
  * A simple text editor with file open/save capabilities
@@ -29,5 +29,5 @@ export declare class TextEditor {
 /**
  * Launch the text editor application
  */
-export declare function launchTextEditor(): TextEditor;
+export declare function launchTextEditor(): Window;
 //# sourceMappingURL=text-editor.d.ts.map

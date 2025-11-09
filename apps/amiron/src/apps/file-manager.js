@@ -213,5 +213,6 @@ export class FileManager {
  * Launch the file manager application
  */
 export function launchFileManager() {
-    return new FileManager();
+    const fileManager = new FileManager();
+    return fileManager.getWindow();
 }
