@@ -13,13 +13,8 @@
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-  
-  [plugins.inputs]
-    # Next.js plugin otomatik olarak Next.js'i algılar ve build eder
-    # Monorepo için Next.js uygulamasının bulunduğu dizini belirtiyoruz
-    nextRuntime = "nodejs18"
-    # Monorepo için base directory (opsiyonel, plugin otomatik algılar)
-    # base = "apps/necrodev"
+  # Next.js plugin otomatik olarak Next.js'i algılar ve build eder
+  # Monorepo için otomatik olarak apps/necrodev dizinindeki Next.js'i algılar
 
 # Next.js plugin otomatik redirects ekler, ama yine de ekleyelim
 [[redirects]]
