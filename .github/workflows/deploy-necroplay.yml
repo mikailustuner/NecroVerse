@@ -47,6 +47,13 @@ jobs:
             echo "base_path=/$REPO_NAME" >> $GITHUB_OUTPUT
           fi
 
+      - name: Set application URLs
+        id: urls
+        run: |
+          BASE_URL="https://${{ github.repository_owner }}.github.io"
+          echo "app_url=$BASE_URL/NecroVerse" >> $GITHUB_OUTPUT
+          echo "necroplay_url=$BASE_URL/NecroVerse" >> $GITHUB_OUTPUT
+
       - name: Build Necroplay
         run: |
           # Dynamic route'u geçici olarak devre dışı bırak
@@ -61,12 +68,26 @@ jobs:
         env:
           NEXT_EXPORT: true
           NEXT_PUBLIC_BASE_PATH: ${{ steps.repo.outputs.base_path }}
+          # Supabase environment variables (use secrets if available, otherwise fallback to defaults)
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          # Application URLs
+          NEXT_PUBLIC_APP_URL: ${{ steps.urls.outputs.app_url }}
+          NEXT_PUBLIC_NECROPLAY_URL: ${{ steps.urls.outputs.necroplay_url }}
+          NEXT_PUBLIC_AMIRON_URL: ${{ secrets.NEXT_PUBLIC_AMIRON_URL }}
 
       - name: Build Necrodev
         run: pnpm run build:github:necrodev
         env:
           NEXT_EXPORT: true
           NEXT_PUBLIC_BASE_PATH: ${{ steps.repo.outputs.base_path }}/necrodev
+          # Supabase environment variables (use secrets if available, otherwise fallback to defaults)
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          # Application URLs
+          NEXT_PUBLIC_APP_URL: ${{ steps.urls.outputs.app_url }}
+          NEXT_PUBLIC_NECROPLAY_URL: ${{ steps.urls.outputs.necroplay_url }}
+          NEXT_PUBLIC_AMIRON_URL: ${{ secrets.NEXT_PUBLIC_AMIRON_URL }}
 
       - name: Merge build outputs
         run: |
