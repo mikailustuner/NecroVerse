@@ -1,0 +1,8 @@
+{
+  "version": 2,
+  "buildCommand": "pnpm run build:vercel",
+  "installCommand": "pnpm install",
+  "framework": null,
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD ./"
+}
+
