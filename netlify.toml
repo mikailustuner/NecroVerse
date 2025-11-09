@@ -6,9 +6,6 @@
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-  [plugins.inputs]
-    # Monorepo için Next.js uygulamasının bulunduğu dizin
-    base = "apps/necroplay"
 
 # Next.js plugin otomatik redirects ekler, ama yine de ekleyelim
 [[redirects]]
