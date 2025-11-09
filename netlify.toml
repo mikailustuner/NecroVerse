@@ -3,7 +3,7 @@
   # Bu dosya necrodev için - root'ta deploy edildiğinde necrodev açılır
   command = "pnpm run build:netlify"
   # Monorepo için Next.js build output dizini
-  publish = "apps/necrodev/.next"
+  publish = "upapps/necrodev/.next"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
