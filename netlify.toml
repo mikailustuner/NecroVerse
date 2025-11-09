@@ -14,17 +14,18 @@
 
 # Path-based routing için redirects
 # /necrodev/* -> necrodev uygulamasına yönlendir
-# Necrodev basePath ile /necrodev prefix'i eklenmiş, bu yüzden direkt olarak çalışır
+# Necrodev basePath ile /necrodev prefix'i eklenmiş, build output'una merge edilmiş
+# Next.js plugin necroplay'i serve ediyor, ancak merge edilmiş build output'unda necrodev de var
+[[redirects]]
+  from = "/necrodev"
+  to = "/necrodev/"
+  status = 200
+
+# Necrodev için tüm path'leri Next.js function'a yönlendir
+# Merge edilmiş build output'unda necrodev'in server files'ları var
 [[redirects]]
   from = "/necrodev/*"
-  to = "/necrodev/:splat"
-  status = 200
-  force = true
-
-# Necrodev static assets için
-[[redirects]]
-  from = "/necrodev/_next/*"
-  to = "/necrodev/_next/:splat"
+  to = "/.netlify/functions/next"
   status = 200
   force = true
 
