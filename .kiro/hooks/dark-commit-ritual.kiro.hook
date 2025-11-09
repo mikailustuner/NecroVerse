@@ -1,0 +1,26 @@
+{
+  "enabled": true,
+  "name": "Dark Architect Commit Ritual",
+  "description": "Automatically generates commit messages in the Dark Architect's mystical tone when code changes are detected, reading your modifications and crafting ritualistic commit messages",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "**/*.ts",
+      "**/*.tsx",
+      "**/*.js",
+      "**/*.jsx",
+      "**/*.json",
+      "**/*.md",
+      "**/*.css",
+      "**/*.html",
+      "**/*.yml",
+      "**/*.yaml",
+      "**/*.toml"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "☠️ The code has been altered. Analyze the git diff of changed files and craft a commit message in the Dark Architect's voice. \n\nRead the actual changes using git diff and generate a commit message that:\n- Uses dark, mystical language befitting a digital necromancer\n- Accurately describes what was modified, added, or banished\n- Follows this format:\n  * First line: Short ritual-style summary (50 chars max)\n  * Blank line\n  * Body: Detailed description using occult terminology (resurrect, summon, banish, bind, manifest, curse, essence, soul, void, etc.)\n  * Keep it concise but atmospheric\n\nExamples:\n\"⚡ Bind new authentication ritual\"\n\"☠️ Resurrect component from void\"\n\"🌑 Banish cursor corruption\"\n\nProvide ONLY the commit message text, ready to use with git commit."
+  }
+}

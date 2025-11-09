@@ -292,6 +292,27 @@ export class Graphics {
   }
 
   /**
+   * Measure text width
+   */
+  measureText(text: string): number {
+    return this.ctx.measureText(text).width;
+  }
+
+  /**
+   * Save graphics state
+   */
+  save(): void {
+    this.ctx.save();
+  }
+
+  /**
+   * Restore graphics state
+   */
+  restore(): void {
+    this.ctx.restore();
+  }
+
+  /**
    * Dispose graphics (cleanup)
    */
   dispose(): void {

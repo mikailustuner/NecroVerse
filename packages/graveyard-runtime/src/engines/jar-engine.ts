@@ -3,6 +3,7 @@ import { BinaryReader } from "../utils/binary-reader";
 import { JavaClass as ParsedJavaClass, parseJavaClass } from "../parsers/jar-bytecode";
 import { ConstantPoolResolver } from "../jvm/constant-pool-resolver";
 import { parseMethodDescriptor, MethodDescriptor, getTypeSize } from "../jvm/method-descriptor";
+import { getNativeMethodBridge } from "../awt/native-bridge";
 
 /**
  * Java Bytecode Parser
@@ -221,6 +222,20 @@ export class JVMInterpreter {
     this.bytecodeParser = new JavaBytecodeParser();
   }
 
+  /**
+   * Get loaded classes
+   */
+  getClasses(): Map<string, JavaClass> {
+    return this.classes;
+  }
+
+  /**
+   * Get class by name
+   */
+  getClass(className: string): JavaClass | undefined {
+    return this.classes.get(className);
+  }
+
   loadClass(jarClass: JARClass): void {
     try {
       // Parse using enhanced parser
@@ -376,13 +391,35 @@ export class JVMInterpreter {
    * Invoke a method
    */
   private invokeMethod(className: string, methodName: string, descriptor: string, objectRef: any, args: any[]): any {
+    // Check if method is native
+    const nativeBridge = getNativeMethodBridge();
+    if (nativeBridge.hasMethod(className, methodName)) {
+      return nativeBridge.invoke(className, methodName, descriptor, objectRef, ...args);
+    }
+    
     const resolved = this.resolveMethod(className, methodName, descriptor);
     if (!resolved) {
+      // Try native method as fallback
+      const nativeResult = nativeBridge.invoke(className, methodName, descriptor, objectRef, ...args);
+      if (nativeResult !== undefined) {
+        return nativeResult;
+      }
       console.warn(`[JVMInterpreter] Method not found: ${className}.${methodName}${descriptor}`);
       return undefined;
     }
     
     const { class: javaClass, method } = resolved;
+    
+    // Check if method has no code (native or abstract)
+    if (!method.code || method.code.length === 0) {
+      // Try native method
+      const nativeResult = nativeBridge.invoke(className, methodName, descriptor, objectRef, ...args);
+      if (nativeResult !== undefined) {
+        return nativeResult;
+      }
+      console.warn(`[JVMInterpreter] Method has no code: ${className}.${methodName}${descriptor}`);
+      return undefined;
+    }
     
     // Save current context
     const savedClass = this.currentClass;
@@ -1340,10 +1377,29 @@ export class JVMInterpreter {
             if (resolver && objectref) {
               try {
                 const fieldRef = resolver.getFieldRef(index);
-                // For now, return default value
-                // In full implementation, would access object's field
-                this.stack.push(0);
+                // Get object's class name
+                let targetClassName = fieldRef.className;
+                if (objectref && typeof objectref === 'object' && objectref.__class) {
+                  targetClassName = objectref.__class;
+                }
+                
+                // Resolve field from class hierarchy
+                const fieldResolved = this.resolveField(targetClassName, fieldRef.fieldName);
+                if (fieldResolved && objectref && typeof objectref === 'object') {
+                  // Access field from object
+                  const fieldName = fieldRef.fieldName;
+                  if (fieldName in objectref) {
+                    this.stack.push(objectref[fieldName]);
+                  } else {
+                    // Return default value based on field type
+                    this.stack.push(0);
+                  }
+                } else {
+                  // Return default value
+                  this.stack.push(0);
+                }
               } catch (e) {
+                console.warn(`[JVMInterpreter] getfield failed:`, e);
                 this.stack.push(0);
               }
             } else {
@@ -1361,12 +1417,21 @@ export class JVMInterpreter {
             if (resolver && objectref) {
               try {
                 const fieldRef = resolver.getFieldRef(index);
-                // In full implementation, would store in object's field
-                if (objectref && typeof objectref === 'object') {
-                  objectref[fieldRef.fieldName] = value;
+                // Get object's class name
+                let targetClassName = fieldRef.className;
+                if (objectref && typeof objectref === 'object' && objectref.__class) {
+                  targetClassName = objectref.__class;
+                }
+                
+                // Resolve field from class hierarchy
+                const fieldResolved = this.resolveField(targetClassName, fieldRef.fieldName);
+                if (fieldResolved && objectref && typeof objectref === 'object') {
+                  // Store field in object
+                  const fieldName = fieldRef.fieldName;
+                  objectref[fieldName] = value;
                 }
               } catch (e) {
-                // Ignore
+                console.warn(`[JVMInterpreter] putfield failed:`, e);
               }
             }
           }
@@ -1556,7 +1621,11 @@ export class JVMInterpreter {
                 };
                 this.objectHeap.set(objectId, newObject);
                 this.stack.push(newObject);
+                
+                // Note: Constructor will be called with invokespecial after this
+                // The object is pushed on stack first, then constructor is called
               } catch (e) {
+                console.warn(`[JVMInterpreter] Failed to create object for class index ${index}:`, e);
                 // Fallback: create empty object
                 const objectId = this.nextObjectId++;
                 const newObject: any = {

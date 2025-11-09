@@ -4,6 +4,7 @@
  */
 
 import { Graphics, Color, Font } from "./graphics";
+import { ComponentListenerManager, MouseEvent, KeyEvent, ActionEvent } from "./events";
 
 /**
  * Component base class
@@ -21,6 +22,7 @@ export abstract class Component {
   parent: Container | null = null;
   private repaintRequested: boolean = false;
   private repaintTimer: number | null = null;
+  protected listeners: ComponentListenerManager = new ComponentListenerManager();
 
   /**
    * Paint component

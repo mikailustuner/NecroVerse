@@ -7,6 +7,7 @@ import { RuntimeConfig } from "../types";
 import { Logger } from "../utils/logger";
 import { Graphics } from "../awt/graphics";
 import { Applet } from "../awt/applet";
+import { attachDOMEventListeners } from "../awt/dom-event-mapper";
 
 /**
  * Custom JAR Runtime
@@ -148,9 +149,28 @@ export class JARRuntime {
       console.log("[JARRuntime] Initializing applet:", mainClass);
       
       // Try to instantiate applet class using JVM interpreter
-      // For now, create a basic applet instance
-      // In full implementation, would use JVM to instantiate the actual class
-      this.applet = new Applet();
+      let appletInstance: any = null;
+      
+      try {
+        // Try to instantiate using JVM
+        // First, create object with 'new' opcode (simulated)
+        // Then call constructor with invokespecial
+        // For now, create a wrapper that delegates to JVM methods
+        const javaClass = this.interpreter.getClass(mainClass);
+        if (javaClass) {
+          // Create applet wrapper that uses JVM for method calls
+          appletInstance = this.createAppletWrapper(mainClass, javaClass);
+        }
+      } catch (e) {
+        console.warn("[JARRuntime] Failed to instantiate applet via JVM, using fallback:", e);
+      }
+      
+      // Fallback to basic applet if JVM instantiation failed
+      if (!appletInstance) {
+        appletInstance = new Applet();
+      }
+      
+      this.applet = appletInstance;
       
       // Set applet size
       this.applet.setSize(this.canvas.width, this.canvas.height);
@@ -171,6 +191,9 @@ export class JARRuntime {
       this.applet.init();
       this.applet.start();
       
+      // Attach DOM event listeners
+      attachDOMEventListeners(this.canvas, this.applet);
+      
       // Start rendering loop
       this.startRenderingLoop();
       
@@ -179,6 +202,73 @@ export class JARRuntime {
       console.error("Failed to initialize applet:", error);
       this.showError(error instanceof Error ? error.message : "Unknown error");
     }
+  }
+
+  /**
+   * Create applet wrapper that delegates method calls to JVM
+   */
+  private createAppletWrapper(className: string, javaClass: any): Applet {
+    const baseApplet = new Applet();
+    
+    // Override methods to delegate to JVM
+    const originalInit = baseApplet.init.bind(baseApplet);
+    const originalStart = baseApplet.start.bind(baseApplet);
+    const originalPaint = baseApplet.paint.bind(baseApplet);
+    const originalStop = baseApplet.stop.bind(baseApplet);
+    const originalDestroy = baseApplet.destroy.bind(baseApplet);
+    
+    // Wrap methods to call JVM if method exists
+    baseApplet.init = () => {
+      try {
+        // Try to call init() via JVM
+        this.interpreter.executeMethod(className, 'init', []);
+      } catch (e) {
+        // Fallback to default
+        originalInit();
+      }
+    };
+    
+    baseApplet.start = () => {
+      try {
+        // Try to call start() via JVM
+        this.interpreter.executeMethod(className, 'start', []);
+      } catch (e) {
+        // Fallback to default
+        originalStart();
+      }
+    };
+    
+    baseApplet.paint = (g: Graphics) => {
+      try {
+        // Try to call paint(Graphics) via JVM
+        this.interpreter.executeMethod(className, 'paint', [g]);
+      } catch (e) {
+        // Fallback to default
+        originalPaint(g);
+      }
+    };
+    
+    baseApplet.stop = () => {
+      try {
+        // Try to call stop() via JVM
+        this.interpreter.executeMethod(className, 'stop', []);
+      } catch (e) {
+        // Fallback to default
+        originalStop();
+      }
+    };
+    
+    baseApplet.destroy = () => {
+      try {
+        // Try to call destroy() via JVM
+        this.interpreter.executeMethod(className, 'destroy', []);
+      } catch (e) {
+        // Fallback to default
+        originalDestroy();
+      }
+    };
+    
+    return baseApplet;
   }
 
   /**
