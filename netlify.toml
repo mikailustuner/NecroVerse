@@ -1,11 +1,11 @@
 [build]
   # Monorepo için root'ta build yap, her iki Next.js uygulamasını da build et
-  # Path-based routing: /* -> necrodev (root), /necroplay/* -> necroplay
+  # Path-based routing: /necrodev/* -> necrodev, /* -> necroplay
   base = "."
   command = "pnpm run build:netlify"
-  # Necrodev root'ta, necroplay /necroplay path'inde
+  # Necroplay root'ta, necrodev /necrodev path'inde
   # Her iki uygulamanın build output'u birleştirilmiş olacak
-  publish = "apps/necrodev/.next"
+  publish = "apps/necroplay/.next"
 
 [build.environment]
   NODE_VERSION = "18"
@@ -14,24 +14,24 @@
   PNPM_FLAGS = "--filter @necroverse/necrodev... --filter @necroverse/necroplay..."
 
 # Path-based routing için redirects
-# Root ve diğer path'ler -> necrodev uygulamasına yönlendir (Next.js plugin otomatik yönetir)
-# Next.js plugin sadece bir uygulama için çalışır, bu yüzden necrodev root'ta
+# /necrodev/* -> necrodev uygulamasına yönlendir
+# Necrodev basePath ile /necrodev prefix'i eklenmiş, bu yüzden direkt olarak çalışır
+# Not: Necrodev build output'u necroplay build output'una merge edilmiş olacak
+[[redirects]]
+  from = "/necrodev"
+  to = "/necrodev/"
+  status = 200
+  force = true
+
+# Necrodev için tüm path'leri yönlendir
+[[redirects]]
+  from = "/necrodev/*"
+  to = "/necrodev/:splat"
+  status = 200
+  force = true
+
+# Root ve diğer path'ler -> necroplay uygulamasına yönlendir (Next.js plugin otomatik yönetir)
+# Next.js plugin sadece bir uygulama için çalışır, bu yüzden necroplay root'ta
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-  # Next.js plugin otomatik olarak apps/necrodev dizinindeki Next.js'i algılar
-
-# Necroplay için path-based routing
-# /necroplay/* -> necroplay uygulamasına yönlendir
-# Necroplay basePath ile /necroplay prefix'i eklenmiş, bu yüzden direkt olarak çalışır
-# Not: Necroplay build output'u necrodev build output'una merge edilmiş olacak
-# Next.js plugin sadece necrodev'i serve ediyor, bu yüzden necroplay için redirects yeterli
-[[redirects]]
-  from = "/necroplay"
-  to = "/necroplay/"
-  status = 200
-
-# Necroplay için tüm path'leri yönlendir (force olmadan, Next.js plugin handle etsin)
-[[redirects]]
-  from = "/necroplay/*"
-  to = "/necroplay/:splat"
-  status = 200
+  # Next.js plugin otomatik olarak apps/necroplay dizinindeki Next.js'i algılar

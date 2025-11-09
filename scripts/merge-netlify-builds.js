@@ -31,59 +31,59 @@ function copyRecursiveSync(src, dest) {
   }
 }
 
-// Necroplay build output'unu necrodev build output'una kopyala
-// Necroplay basePath ile /necroplay prefix'i eklenmiş, bu yüzden direkt olarak çalışır
+// Necrodev build output'unu necroplay build output'una kopyala
+// Necrodev basePath ile /necrodev prefix'i eklenmiş, bu yüzden direkt olarak çalışır
 if (fs.existsSync(necrodevBuild) && fs.existsSync(necroplayBuild)) {
-  console.log('Necroplay build found, copying to necrodev build...');
+  console.log('Necrodev build found, copying to necroplay build...');
   
-  // Necroplay'in static files'larını necrodev'e kopyala (merge)
-  const necroplayStatic = path.join(necroplayBuild, 'static');
+  // Necrodev'in static files'larını necroplay'e kopyala (merge)
   const necrodevStatic = path.join(necrodevBuild, 'static');
+  const necroplayStatic = path.join(necroplayBuild, 'static');
   
-  if (fs.existsSync(necroplayStatic)) {
-    console.log('Merging necroplay static files...');
+  if (fs.existsSync(necrodevStatic)) {
+    console.log('Merging necrodev static files...');
     // Static files'ları merge et (aynı isimdeki dosyalar üzerine yazılır)
-    fs.readdirSync(necroplayStatic).forEach(item => {
-      const src = path.join(necroplayStatic, item);
-      const dest = path.join(necrodevStatic, item);
+    fs.readdirSync(necrodevStatic).forEach(item => {
+      const src = path.join(necrodevStatic, item);
+      const dest = path.join(necroplayStatic, item);
       copyRecursiveSync(src, dest);
     });
   }
   
-  // Necroplay'in standalone output'unu kopyala (eğer varsa)
-  const necroplayStandalone = path.join(necroplayBuild, 'standalone');
-  if (fs.existsSync(necroplayStandalone)) {
-    console.log('Copying necroplay standalone files...');
-    const necrodevStandalone = path.join(necrodevBuild, 'standalone');
-    copyRecursiveSync(necroplayStandalone, necrodevStandalone);
+  // Necrodev'in standalone output'unu kopyala (eğer varsa)
+  const necrodevStandalone = path.join(necrodevBuild, 'standalone');
+  if (fs.existsSync(necrodevStandalone)) {
+    console.log('Copying necrodev standalone files...');
+    const necroplayStandalone = path.join(necroplayBuild, 'standalone');
+    copyRecursiveSync(necrodevStandalone, necroplayStandalone);
   }
   
-  // Necroplay'in server files'larını kopyala (functions için)
-  const necroplayServer = path.join(necroplayBuild, 'server');
+  // Necrodev'in server files'larını kopyala (functions için)
   const necrodevServer = path.join(necrodevBuild, 'server');
+  const necroplayServer = path.join(necroplayBuild, 'server');
   
-  if (fs.existsSync(necroplayServer)) {
-    console.log('Copying necroplay server files...');
+  if (fs.existsSync(necrodevServer)) {
+    console.log('Copying necrodev server files...');
     // Server files'ları merge et
-    fs.readdirSync(necroplayServer).forEach(item => {
-      const src = path.join(necroplayServer, item);
-      const dest = path.join(necrodevServer, item);
+    fs.readdirSync(necrodevServer).forEach(item => {
+      const src = path.join(necrodevServer, item);
+      const dest = path.join(necroplayServer, item);
       copyRecursiveSync(src, dest);
     });
   }
   
-  // Necroplay'in pages'larını kopyala (eğer varsa)
-  const necroplayPages = path.join(necroplayBuild, 'server', 'pages');
+  // Necrodev'in pages'larını kopyala (eğer varsa)
   const necrodevPages = path.join(necrodevBuild, 'server', 'pages');
+  const necroplayPages = path.join(necroplayBuild, 'server', 'pages');
   
-  if (fs.existsSync(necroplayPages)) {
-    console.log('Copying necroplay pages...');
-    if (!fs.existsSync(necrodevPages)) {
-      fs.mkdirSync(necrodevPages, { recursive: true });
+  if (fs.existsSync(necrodevPages)) {
+    console.log('Copying necrodev pages...');
+    if (!fs.existsSync(necroplayPages)) {
+      fs.mkdirSync(necroplayPages, { recursive: true });
     }
-    fs.readdirSync(necroplayPages).forEach(item => {
-      const src = path.join(necroplayPages, item);
-      const dest = path.join(necrodevPages, item);
+    fs.readdirSync(necrodevPages).forEach(item => {
+      const src = path.join(necrodevPages, item);
+      const dest = path.join(necroplayPages, item);
       copyRecursiveSync(src, dest);
     });
   }
