@@ -18,13 +18,6 @@ import {
 import { Button, LoadingRing, ErrorDisplay } from "@ui";
 import { RuntimeErrorBoundary } from "./error-boundary";
 
-// Static export için generateStaticParams - boş array döndürüyoruz çünkü dynamic route
-export async function generateStaticParams() {
-  // Static export için boş array döndürüyoruz
-  // Gerçek sayfalar runtime'da client-side olarak oluşturulacak
-  return [];
-}
-
 interface FileRecord {
   id: string;
   name: string;

@@ -36,10 +36,22 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Get repository name
+        id: repo
+        run: |
+          REPO_NAME=${GITHUB_REPOSITORY#*/}
+          # Eğer repo adı username.github.io ise, basePath boş olmalı
+          if [[ "$REPO_NAME" == *".github.io" ]]; then
+            echo "base_path=" >> $GITHUB_OUTPUT
+          else
+            echo "base_path=/$REPO_NAME" >> $GITHUB_OUTPUT
+          fi
+
       - name: Build Necrodev
         run: pnpm run build:github:necrodev
         env:
           NEXT_EXPORT: true
+          NEXT_PUBLIC_BASE_PATH: ${{ steps.repo.outputs.base_path }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

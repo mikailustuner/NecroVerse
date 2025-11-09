@@ -4,11 +4,15 @@ const path = require("path");
 const nextConfig = {
   reactStrictMode: true,
   // GitHub Pages için static export
+  // Not: Dynamic route'lar static export'ta desteklenmiyor
+  // /play/[id] route'u static export için skip edilecek
   output: process.env.NEXT_EXPORT ? 'export' : undefined,
   // GitHub Pages için basePath (repo adına göre ayarlanabilir)
   basePath: process.env.NEXT_PUBLIC_BASE_PATH || "",
   // GitHub Pages için trailingSlash
   trailingSlash: true,
+  // GitHub Pages için assetPrefix - basePath ile aynı olmalı
+  assetPrefix: process.env.NEXT_PUBLIC_BASE_PATH || undefined,
   transpilePackages: ["@necroverse/ui", "@necroverse/graveyard-runtime"],
   // Ignore TypeScript errors during build (allows build to continue with type errors)
   typescript: {

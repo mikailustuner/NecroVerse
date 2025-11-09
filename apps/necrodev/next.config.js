@@ -18,8 +18,8 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  // GitHub Pages için assetPrefix (eğer basePath varsa)
-  assetPrefix: process.env.NEXT_PUBLIC_BASE_PATH || "",
+  // GitHub Pages için assetPrefix - basePath ile aynı olmalı
+  assetPrefix: process.env.NEXT_PUBLIC_BASE_PATH || undefined,
   webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
