@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  necroverse-dev:
+    image: node:18
+    working_dir: /app
+    volumes:
+      - .:/app
+    ports:
+      - "3001:3001"  # necrodev
+      - "3002:3002"  # necroplay
+      - "3003:3003"  # amiron
+    command: sh -c "npm install -g pnpm@8.12.0 && pnpm install && pnpm run dev"
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=development
+
