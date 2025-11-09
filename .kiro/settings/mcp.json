@@ -1,0 +1,63 @@
+{
+  "mcpServers": {
+    "legacy-converter": {
+      "command": "node",
+      "args": ["packages/mcp/legacy-converter.js"],
+      "env": {
+        "NODE_ENV": "development",
+        "LOG_LEVEL": "info"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "convert",
+        "analyze",
+        "compile"
+      ],
+      "description": "Converts legacy files (Flash, VB6, Delphi) into executable WebAssembly modules",
+      "capabilities": [
+        "Flash (.swf) to WASM compilation",
+        "VB6 (.vb6) to WASM compilation",
+        "Delphi (.pas) to WASM compilation",
+        "Legacy API compatibility layer generation",
+        "Source map generation for debugging"
+      ],
+      "requirements": {
+        "emscripten": "Required for WASM compilation",
+        "node": ">=18.0.0"
+      }
+    },
+    "ghost-nft": {
+      "command": "node",
+      "args": ["packages/mcp/ghost-nft.js"],
+      "env": {
+        "NODE_ENV": "development",
+        "SOLANA_NETWORK": "devnet",
+        "LOG_LEVEL": "info"
+      },
+      "disabled": false,
+      "autoApprove": [
+        "mint",
+        "getMetadata",
+        "updateMetadata"
+      ],
+      "description": "Binds resurrected application data to Solana NFT metadata",
+      "capabilities": [
+        "NFT metadata generation from resurrected code",
+        "Solana devnet/testnet minting",
+        "Code hash storage on-chain",
+        "Resurrection timestamp recording",
+        "Original technology attribution"
+      ],
+      "requirements": {
+        "solana": "Solana CLI tools for wallet management",
+        "node": ">=18.0.0",
+        "wallet": "Solana wallet with devnet SOL"
+      },
+      "configuration": {
+        "network": "devnet",
+        "commitment": "confirmed",
+        "metaplexProgramId": "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
+      }
+    }
+  }
+}

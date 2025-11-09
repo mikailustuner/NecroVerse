@@ -1,0 +1,29 @@
+{
+  "name": "necroverse",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Necroverse - Where Dead Tech Breathes Again",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "clean": "turbo run clean",
+    "type-check": "turbo run type-check",
+    "test": "turbo run test",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "turbo": "^1.11.0",
+    "typescript": "^5.3.3",
+    "@types/node": "^20.10.6",
+    "eslint": "^8.57.0",
+    "prettier": "^3.1.1",
+    "@playwright/test": "^1.40.0"
+  },
+  "packageManager": "pnpm@8.12.0",
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  }
+}
+

@@ -1,0 +1,18 @@
+# Supabase configuration template
+# Copy this to your Supabase project settings
+
+[project]
+name = "necroverse"
+database_url = "postgresql://postgres:[password]@[host]:5432/postgres"
+
+[storage]
+buckets = ["uploads", "converted"]
+
+[storage.buckets.uploads]
+public = false
+allowed_mime_types = ["application/x-shockwave-flash", "application/java-archive", "application/x-silverlight-app", "application/x-director"]
+
+[storage.buckets.converted]
+public = true
+allowed_mime_types = ["application/javascript", "application/wasm", "text/html"]
+

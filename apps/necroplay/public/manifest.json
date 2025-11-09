@@ -1,0 +1,65 @@
+{
+  "name": "NecroPlay - Graveyard Arcade",
+  "short_name": "NecroPlay",
+  "description": "Play legacy file formats in modern browsers",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0612",
+  "theme_color": "#a855f7",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [],
+  "categories": ["entertainment", "games", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Play",
+      "short_name": "Play",
+      "description": "Play a file",
+      "url": "/play",
+        "icons": [
+          {
+            "src": "/icon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml"
+          }
+        ]
+    },
+    {
+      "name": "Analytics",
+      "short_name": "Analytics",
+      "description": "View analytics",
+      "url": "/analytics",
+        "icons": [
+          {
+            "src": "/icon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml"
+          }
+        ]
+    }
+  ],
+  "share_target": {
+    "action": "/api/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "file",
+          "accept": [".swf", ".jar", ".xap", ".dcr", ".exe", ".dll", ".ocx"]
+        }
+      ]
+    }
+  }
+}
+

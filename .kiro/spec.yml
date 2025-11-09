@@ -1,0 +1,143 @@
+name: NecroNet
+version: 1.0.0
+description: AI-driven resurrection network that revives dead technologies into modern web applications
+
+metadata:
+  tagline: "Resurrect the Dead Code"
+  theme: necro-gothic
+  aesthetic: dark-occult-neon
+
+technology_stack:
+  frontend:
+    - React 18+
+    - TypeScript
+    - Tailwind CSS
+    - Framer Motion
+    - Vite
+    - Monaco Editor
+  
+  backend:
+    - Supabase (PostgreSQL)
+    - Supabase Edge Functions
+    - Supabase Real-time
+  
+  ai_automation:
+    - Kiro Hooks
+    - Kiro MCP Extensions
+    - Kiro Steering
+  
+  blockchain:
+    - Solana Web3.js
+    - Metaplex (NFT)
+  
+  performance:
+    - WebAssembly
+
+applications:
+  - name: NecroDev
+    description: AI IDE for analyzing and resurrecting legacy code
+    entry_point: apps/necrodev/src/main.tsx
+    port: 3000
+  
+  - name: NecroPlay
+    description: Public platform for hosting resurrected applications
+    entry_point: apps/necroplay/src/main.tsx
+    port: 3001
+  
+  - name: CLI
+    description: Terminal interface with occult aesthetic
+    entry_point: packages/cli/index.ts
+
+hooks:
+  - name: on_revive_code
+    description: Analyzes and resurrects legacy code files
+    file: .kiro/hooks/on_revive_code.js
+    trigger: file_upload
+    supported_formats:
+      - .swf (Flash)
+      - .vb6 (Visual Basic 6)
+      - .pas (Delphi)
+  
+  - name: on_commit
+    description: Transforms git commits into occult style
+    file: .kiro/hooks/on_commit.js
+    trigger: git_commit
+    features:
+      - Occult message transformation
+      - ASCII skull art
+      - Ritual sound effects
+  
+  - name: on_ui_generate
+    description: Generates React components with necro-gothic theme
+    file: .kiro/hooks/on_ui_generate.js
+    trigger: ui_generation_request
+    features:
+      - Tailwind CSS with dark theme
+      - Framer Motion animations
+      - Glitch effects
+
+mcp_extensions:
+  - name: LegacyConverter
+    description: Converts legacy files into executable WebAssembly
+    package: packages/mcp/legacy-converter.ts
+    capabilities:
+      - Flash to WASM compilation
+      - VB6 to WASM compilation
+      - Delphi to WASM compilation
+    requirements:
+      - Emscripten toolchain
+      - Compatibility layer for legacy APIs
+  
+  - name: GhostNFT
+    description: Binds resurrected applications to Solana NFTs
+    package: packages/mcp/ghost-nft.ts
+    capabilities:
+      - NFT metadata generation
+      - Solana testnet minting
+      - Code hash storage
+    requirements:
+      - Solana Web3.js
+      - Metaplex SDK
+      - Solana devnet access
+
+steering:
+  - name: Dark Architect
+    file: .kiro/steering/dark-architect.md
+    description: Defines occult personality and ritual-like responses
+    inclusion: always
+
+features:
+  - Resurrection Engine (legacy code analysis and transformation)
+  - Soul Counter (tracks successful resurrections)
+  - Dual-mode platform (NecroDev IDE + NecroPlay runtime)
+  - NFT binding for resurrected applications
+  - WebAssembly compilation for performance
+  - Real-time collaboration via Supabase
+  - Dark gothic UI with neon accents and glitch effects
+
+supported_legacy_technologies:
+  - Adobe Flash (.swf)
+  - Visual Basic 6 (.vb6)
+  - Delphi (.pas)
+
+output_formats:
+  - React + TypeScript components
+  - Vanilla JavaScript
+  - WebAssembly modules
+
+theme:
+  colors:
+    void: "#0f0a1f"
+    arcane: "#a800ff"
+    blood: "#ff0055"
+    ghost: "#19ff90"
+  
+  fonts:
+    mono: "Fira Code, Courier New, monospace"
+    display: "Orbitron, sans-serif"
+  
+  effects:
+    - Glitch animations
+    - Glow effects
+    - Pulse animations
+    - Ritual transitions
