@@ -7,7 +7,7 @@
     "dev": "turbo run dev",
     "build": "turbo run build --continue",
     "build:netlify": "pnpm install && (pnpm build || true) && cd apps/necrodev && (pnpm build || exit 1)",
-    "build:vercel": "pnpm install && (pnpm build || true) && cd apps/necrodev && pnpm build --continue",
+    "build:vercel": "pnpm install --no-frozen-lockfile && (pnpm build || true) && cd apps/necrodev && pnpm build --continue",
     "build:amiron": "pnpm --filter @amiron/exec build && pnpm --filter @amiron/pal build && pnpm --filter @amiron/workbench build && pnpm --filter @amiron/ritual-api build && pnpm --filter amiron build",
     "lint": "turbo run lint",
     "clean": "turbo run clean",
