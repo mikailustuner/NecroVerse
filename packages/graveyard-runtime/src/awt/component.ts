@@ -5,6 +5,7 @@
 
 import { Graphics, Color, Font } from "./graphics";
 import { ComponentListenerManager, MouseEvent, KeyEvent, ActionEvent } from "./events";
+import type { LayoutManager } from "./layout";
 
 /**
  * Component base class
@@ -407,20 +408,7 @@ export class Panel extends Container {
   }
 }
 
-/**
- * Layout Manager interface
- */
-export interface LayoutManager {
-  addLayoutComponent(comp: Component, constraints?: any): void;
-  removeLayoutComponent(comp: Component): void;
-  removeAllComponents(): void;
-  layoutContainer(parent: Container): void;
-  minimumLayoutSize(parent: Container): { width: number; height: number };
-  preferredLayoutSize(parent: Container): { width: number; height: number };
-  maximumLayoutSize(parent: Container): { width: number; height: number };
-}
-
-// Export LayoutManager from layout.ts
+// Re-export LayoutManager from layout.ts
 export type { LayoutManager } from "./layout";
 // Re-export as LayoutManagerImpl for compatibility
 export type { LayoutManager as LayoutManagerImpl } from "./layout";

@@ -1,10 +1,13 @@
 [build]
-  command = "cd apps/necroplay && pnpm install && pnpm build"
-  publish = "apps/necroplay/.next"
+  # Monorepo için root'ta install yap, sonra necroplay'i build et
+  command = "pnpm install && cd apps/necroplay && pnpm build"
+  # Next.js plugin kullanıldığında publish dizini otomatik belirlenir
+  # publish dizini belirtilmemeli (plugin otomatik halleder)
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
+# Next.js plugin otomatik redirects ekler, ama yine de ekleyelim
 [[redirects]]
   from = "/*"
   to = "/.netlify/functions/next"
@@ -13,3 +16,5 @@
 [build.environment]
   NODE_VERSION = "18"
   PNPM_VERSION = "8.12.0"
+  # Monorepo için workspace ayarları
+  PNPM_FLAGS = "--filter @necroverse/necroplay..."
