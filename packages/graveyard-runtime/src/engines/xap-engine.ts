@@ -233,8 +233,8 @@ export class XAMLParser {
   /**
    * Parse attributes including attached properties
    */
-  private parseAttributes(attributesStr: string): Record<string, string> {
-    const attributes: Record<string, string> = {};
+  private parseAttributes(attributesStr: string): Record<string, any> {
+    const attributes: Record<string, any> = {};
     const attachedProperties: Record<string, string> = {};
     
     // Match attributes: name="value" or name='value'

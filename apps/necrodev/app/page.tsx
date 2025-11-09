@@ -159,7 +159,10 @@ export default function HomePage() {
           </Button>
           <Button
             variant="cyan"
-            onClick={() => (window.location.href = "http://localhost:3002")}
+            onClick={() => {
+              const necroplayUrl = process.env.NEXT_PUBLIC_NECROPLAY_URL || "https://necroplay.netlify.app";
+              window.location.href = necroplayUrl;
+            }}
             className="text-lg px-8 py-4"
           >
             💀 NecroPlay
@@ -167,7 +170,10 @@ export default function HomePage() {
           </Button>
           <Button
             variant="ghost"
-            onClick={() => (window.location.href = "http://localhost:3003")}
+            onClick={() => {
+              const amironUrl = process.env.NEXT_PUBLIC_AMIRON_URL || "https://amiron.netlify.app";
+              window.location.href = amironUrl;
+            }}
             className="text-lg px-8 py-4 border-2 border-purple-500"
           >
             ☠️ Amiron Desktop

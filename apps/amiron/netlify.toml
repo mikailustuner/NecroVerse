@@ -1,0 +1,18 @@
+[build]
+  # Monorepo için root'ta install yap, tüm paketleri build et, sonra amiron'u build et
+  command = "cd ../.. && pnpm install && pnpm build && cd apps/amiron && pnpm build"
+  # Vite build output dizini
+  publish = "dist"
+
+# Vite SPA için redirects (tüm route'ları index.html'e yönlendir)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[build.environment]
+  NODE_VERSION = "18"
+  PNPM_VERSION = "8.12.0"
+  # Monorepo için workspace ayarları
+  PNPM_FLAGS = "--filter amiron..."
+
