@@ -67,7 +67,7 @@ export class JavaClassParser {
   private reader: BinaryReader;
   private constantPool: ConstantPoolEntry[] = [];
 
-  constructor(buffer: ArrayBuffer) {
+  constructor(buffer: ArrayBufferLike) {
     this.reader = new BinaryReader(buffer, false); // Big-endian
   }
 
@@ -496,7 +496,7 @@ export class JavaClassParser {
 /**
  * Parse Java .class file from ArrayBuffer
  */
-export function parseJavaClass(buffer: ArrayBuffer): JavaClass {
+export function parseJavaClass(buffer: ArrayBufferLike): JavaClass {
   const parser = new JavaClassParser(buffer);
   return parser.parse();
 }
