@@ -103,6 +103,11 @@ jobs:
           NEXT_PUBLIC_NECROPLAY_URL: ${{ steps.urls.outputs.necroplay_url }}
           NEXT_PUBLIC_AMIRON_URL: ${{ steps.urls.outputs.amiron_url }}
 
+      - name: Build Amiron
+        run: pnpm run build:github:amiron
+        env:
+          VITE_BASE_PATH: ${{ steps.repo.outputs.base_path }}/amiron
+
       - name: Merge build outputs
         run: |
           # Necrodev'in build output'unu necroplay'in build output'una kopyala
@@ -115,6 +120,14 @@ jobs:
             if [ -d "apps/necrodev/out/_next" ]; then
               cp -r apps/necrodev/out/_next apps/necroplay/out/necrodev/
             fi
+          fi
+          
+          # Amiron'un build output'unu necroplay'in build output'una kopyala
+          # Amiron /NecroVerse/amiron path'inde olacak
+          if [ -d "apps/amiron/dist" ]; then
+            mkdir -p apps/necroplay/out/amiron
+            # Amiron'un tüm dosyalarını kopyala
+            cp -r apps/amiron/dist/* apps/necroplay/out/amiron/
           fi
 
       - name: Setup Pages
