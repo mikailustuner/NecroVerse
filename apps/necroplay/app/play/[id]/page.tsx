@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/lib/supabase";
@@ -17,6 +17,9 @@ import {
 } from "@graveyard-runtime/runtime";
 import { Button, LoadingRing, ErrorDisplay } from "@ui";
 import { RuntimeErrorBoundary } from "./error-boundary";
+
+// Static export için: Dynamic route'ları desteklemek için generateStaticParams eklenebilir
+// Ancak tüm ID'leri önceden bilmek gerekir, bu yüzden client-side routing kullanıyoruz
 
 interface FileRecord {
   id: string;
@@ -39,7 +42,42 @@ interface LogEntry {
 export default function PlayPage() {
   const params = useParams();
   const router = useRouter();
-  const fileId = params.id as string;
+  const [pathname, setPathname] = useState<string>("");
+  
+  // Pathname'i takip et (static export için)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setPathname(window.location.pathname);
+      
+      // Pathname değişikliklerini dinle (popstate event)
+      const handlePopState = () => {
+        setPathname(window.location.pathname);
+      };
+      
+      window.addEventListener('popstate', handlePopState);
+      return () => window.removeEventListener('popstate', handlePopState);
+    }
+  }, []);
+  
+  // Static export için fallback: URL'den ID'yi parse et
+  const fileId = useMemo((): string | null => {
+    // Önce Next.js params'dan dene
+    if (params?.id) {
+      return params.id as string;
+    }
+    
+    // Static export'ta params çalışmaz, URL'den parse et
+    const currentPathname = pathname || (typeof window !== 'undefined' ? window.location.pathname : '');
+    if (currentPathname) {
+      // /play/[id] veya /play/[id]/ formatını parse et
+      const match = currentPathname.match(/\/play\/([^\/]+)/);
+      if (match && match[1]) {
+        return match[1];
+      }
+    }
+    
+    return null;
+  }, [params?.id, pathname]);
 
   const [file, setFile] = useState<FileRecord | null>(null);
   const [logs, setLogs] = useState<LogEntry[]>([]);
@@ -53,8 +91,12 @@ export default function PlayPage() {
     if (fileId) {
       loadFile();
       loadLogs();
+    } else {
+      // ID bulunamadıysa loading'i durdur
+      setLoading(false);
     }
-  }, [fileId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fileId]); // loadFile ve loadLogs zaten fileId'ye bağlı, bu yüzden sadece fileId yeterli
 
   useEffect(() => {
     let runtimeInstance: any = null;
@@ -73,7 +115,12 @@ export default function PlayPage() {
     };
   }, [file, containerRef]);
 
-  const loadFile = async () => {
+  const loadFile = useCallback(async () => {
+    if (!fileId) {
+      setLoading(false);
+      return;
+    }
+    
     try {
       const { data, error } = await supabase
         .from("files")
@@ -90,9 +137,11 @@ export default function PlayPage() {
       console.error("Error loading file:", error);
       setLoading(false);
     }
-  };
+  }, [fileId]);
 
-  const loadLogs = async () => {
+  const loadLogs = useCallback(async () => {
+    if (!fileId) return;
+    
     try {
       const { data, error } = await supabase
         .from("graveyard_logs")
@@ -115,7 +164,7 @@ export default function PlayPage() {
     } catch (error) {
       console.error("Error loading logs:", error);
     }
-  };
+  }, [fileId]);
 
   const initializeRuntime = async (): Promise<any> => {
     if (!file || !containerRef) {
