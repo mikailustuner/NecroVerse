@@ -25,6 +25,7 @@ pub struct Task {
 pub struct Exec {
     tasks: HashMap<TaskId, Task>,
     next_id: u32,
+    #[allow(dead_code)]
     current_task: Option<TaskId>,
     message_queues: HashMap<TaskId, Vec<Vec<u8>>>,
 }

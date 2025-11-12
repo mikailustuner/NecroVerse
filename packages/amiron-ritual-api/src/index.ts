@@ -55,7 +55,8 @@ export namespace Amiron {
    * ```
    */
   export function sendMessage(task: TaskId, data: Uint8Array): void {
-    execInstance.send_message(task, Array.from(data));
+    // wasm-bindgen automatically converts Uint8Array to Vec<u8>
+    execInstance.send_message(task, data);
   }
   
   /**
