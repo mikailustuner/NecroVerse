@@ -9,7 +9,7 @@
     "pkg"
   ],
   "scripts": {
-    "build": "echo \"Using mock TypeScript implementation. Install Rust + wasm-pack for WASM build.\"",
+    "build": "wasm-pack build --target web --out-dir pkg",
     "build:wasm": "wasm-pack build --target web --out-dir pkg",
     "build:release": "wasm-pack build --target web --out-dir pkg --release",
     "clean": "rimraf pkg target"
