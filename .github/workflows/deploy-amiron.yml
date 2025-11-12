@@ -1,4 +1,4 @@
-name: Deploy Necroplay to GitHub Pages
+name: Deploy Amiron to GitHub Pages
 
 on:
   push:
@@ -12,7 +12,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages-necroplay"
+  group: "pages-amiron"
   cancel-in-progress: false
 
 jobs:
@@ -73,48 +73,25 @@ jobs:
         id: urls
         run: |
           BASE_URL="https://${{ github.repository_owner }}.github.io"
-          echo "app_url=$BASE_URL/NecroVerse" >> $GITHUB_OUTPUT
-          echo "necroplay_url=$BASE_URL/NecroVerse" >> $GITHUB_OUTPUT
           echo "amiron_url=$BASE_URL/NecroVerse/amiron" >> $GITHUB_OUTPUT
 
-      - name: Build Necroplay
-        run: pnpm run build:github:necroplay
+      - name: Build Amiron
+        run: pnpm run build:github:amiron
         env:
-          NEXT_EXPORT: true
-          NEXT_PUBLIC_BASE_PATH: ${{ steps.repo.outputs.base_path }}
-          # Supabase environment variables (use secrets if available, otherwise fallback to defaults)
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          # Application URLs
-          NEXT_PUBLIC_APP_URL: ${{ steps.urls.outputs.app_url }}
-          NEXT_PUBLIC_NECROPLAY_URL: ${{ steps.urls.outputs.necroplay_url }}
-          NEXT_PUBLIC_AMIRON_URL: ${{ steps.urls.outputs.amiron_url }}
+          VITE_BASE_PATH: ${{ steps.repo.outputs.base_path }}/amiron
 
-      - name: Build Necrodev
-        run: pnpm run build:github:necrodev
-        env:
-          NEXT_EXPORT: true
-          NEXT_PUBLIC_BASE_PATH: ${{ steps.repo.outputs.base_path }}/necrodev
-          # Supabase environment variables (use secrets if available, otherwise fallback to defaults)
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          # Application URLs
-          NEXT_PUBLIC_APP_URL: ${{ steps.urls.outputs.app_url }}
-          NEXT_PUBLIC_NECROPLAY_URL: ${{ steps.urls.outputs.necroplay_url }}
-          NEXT_PUBLIC_AMIRON_URL: ${{ steps.urls.outputs.amiron_url }}
-
-      - name: Merge build outputs
+      - name: Create output directory with base path structure
         run: |
-          # Necrodev'in build output'unu necroplay'in build output'una kopyala
-          # Necrodev /NecroVerse/necrodev path'inde olacak
-          if [ -d "apps/necrodev/out" ]; then
-            mkdir -p apps/necroplay/out/necrodev
-            # Necrodev'in tüm dosyalarını kopyala
-            cp -r apps/necrodev/out/* apps/necroplay/out/necrodev/
-            # _next klasörünü de kopyala (asset'ler için)
-            if [ -d "apps/necrodev/out/_next" ]; then
-              cp -r apps/necrodev/out/_next apps/necroplay/out/necrodev/
-            fi
+          # GitHub Pages için base path yapısını oluştur
+          BASE_PATH="${{ steps.repo.outputs.base_path }}"
+          if [ -n "$BASE_PATH" ]; then
+            # Base path varsa, dist içeriğini base path altına koy
+            mkdir -p apps/amiron/out${BASE_PATH}/amiron
+            cp -r apps/amiron/dist/* apps/amiron/out${BASE_PATH}/amiron/
+          else
+            # Base path yoksa direkt dist'i kopyala
+            mkdir -p apps/amiron/out/amiron
+            cp -r apps/amiron/dist/* apps/amiron/out/amiron/
           fi
 
       - name: Setup Pages
@@ -125,11 +102,11 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: apps/necroplay/out
+          path: apps/amiron/out
 
   deploy:
     environment:
-      name: github-pages-necroplay
+      name: github-pages-amiron
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     needs: build
