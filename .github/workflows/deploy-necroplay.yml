@@ -55,16 +55,7 @@ jobs:
           echo "necroplay_url=$BASE_URL/NecroVerse" >> $GITHUB_OUTPUT
 
       - name: Build Necroplay
-        run: |
-          # Dynamic route'u geçici olarak devre dışı bırak
-          if [ -d "apps/necroplay/app/play/[id]" ]; then
-            mv "apps/necroplay/app/play/[id]" "apps/necroplay/app/play/[id].disabled"
-          fi
-          pnpm run build:github:necroplay
-          # Route'u geri al
-          if [ -d "apps/necroplay/app/play/[id].disabled" ]; then
-            mv "apps/necroplay/app/play/[id].disabled" "apps/necroplay/app/play/[id]"
-          fi
+        run: pnpm run build:github:necroplay
         env:
           NEXT_EXPORT: true
           NEXT_PUBLIC_BASE_PATH: ${{ steps.repo.outputs.base_path }}

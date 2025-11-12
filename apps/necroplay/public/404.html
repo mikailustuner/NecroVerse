@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NecroPlay - Redirecting...</title>
+  <script>
+    (function() {
+      // URL'den /play/[id] formatını kontrol et
+      const path = window.location.pathname;
+      
+      // BasePath'i al (environment variable'dan veya URL'den tahmin et)
+      const basePath = '/NecroVerse'; // GitHub Pages basePath
+      
+      // BasePath'i path'ten çıkar
+      const pathWithoutBase = path.startsWith(basePath) 
+        ? path.substring(basePath.length) 
+        : path;
+      
+      // /play/[id] formatını kontrol et
+      const match = pathWithoutBase.match(/\/play\/([^\/]+)/);
+      
+      if (match && match[1]) {
+        // Play sayfasına yönlendir
+        window.location.href = basePath + '/play/' + match[1] + '/';
+      } else {
+        // Ana sayfaya yönlendir
+        window.location.href = basePath + '/';
+      }
+    })();
+  </script>
+</head>
+<body>
+  <div style="display: flex; align-items: center; justify-content: center; height: 100vh; font-family: system-ui, -apple-system, sans-serif; color: #a855f7; background: #0a0612;">
+    <p>Redirecting...</p>
+  </div>
+</body>
+</html>

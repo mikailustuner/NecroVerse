@@ -69,8 +69,15 @@ export default function PlayPage() {
     // Static export'ta params çalışmaz, URL'den parse et
     const currentPathname = pathname || (typeof window !== 'undefined' ? window.location.pathname : '');
     if (currentPathname) {
+      // BasePath'i hesaba kat (örn: /NecroVerse/play/[id] veya /play/[id])
+      const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+      // BasePath varsa onu kaldır, yoksa direkt pathname'i kullan
+      const pathWithoutBase = basePath 
+        ? currentPathname.replace(new RegExp(`^${basePath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`), '')
+        : currentPathname;
+      
       // /play/[id] veya /play/[id]/ formatını parse et
-      const match = currentPathname.match(/\/play\/([^\/]+)/);
+      const match = pathWithoutBase.match(/\/play\/([^\/]+)/);
       if (match && match[1]) {
         return match[1];
       }
