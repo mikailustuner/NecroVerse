@@ -9,7 +9,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc --build",
+    "build": "tsc --build --force",
     "clean": "rimraf dist",
     "type-check": "tsc --noEmit"
   },

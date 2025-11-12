@@ -9,7 +9,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "pnpm --filter @amiron/pal build && pnpm --filter @amiron/intuition build && tsc --build",
+    "build": "pnpm --filter @amiron/pal build && pnpm --filter @amiron/intuition build && tsc --build --force",
     "clean": "rimraf dist",
     "type-check": "tsc --noEmit"
   },
