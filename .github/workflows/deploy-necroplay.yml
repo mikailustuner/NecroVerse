@@ -33,6 +33,28 @@ jobs:
           node-version: '18'
           cache: 'pnpm'
 
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Cache Rust dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Install wasm-pack
+        run: |
+          curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -53,6 +75,7 @@ jobs:
           BASE_URL="https://${{ github.repository_owner }}.github.io"
           echo "app_url=$BASE_URL/NecroVerse" >> $GITHUB_OUTPUT
           echo "necroplay_url=$BASE_URL/NecroVerse" >> $GITHUB_OUTPUT
+          echo "amiron_url=$BASE_URL/NecroVerse/amiron" >> $GITHUB_OUTPUT
 
       - name: Build Necroplay
         run: pnpm run build:github:necroplay
@@ -65,7 +88,7 @@ jobs:
           # Application URLs
           NEXT_PUBLIC_APP_URL: ${{ steps.urls.outputs.app_url }}
           NEXT_PUBLIC_NECROPLAY_URL: ${{ steps.urls.outputs.necroplay_url }}
-          NEXT_PUBLIC_AMIRON_URL: ${{ secrets.NEXT_PUBLIC_AMIRON_URL }}
+          NEXT_PUBLIC_AMIRON_URL: ${{ steps.urls.outputs.amiron_url }}
 
       - name: Build Necrodev
         run: pnpm run build:github:necrodev
@@ -78,7 +101,12 @@ jobs:
           # Application URLs
           NEXT_PUBLIC_APP_URL: ${{ steps.urls.outputs.app_url }}
           NEXT_PUBLIC_NECROPLAY_URL: ${{ steps.urls.outputs.necroplay_url }}
-          NEXT_PUBLIC_AMIRON_URL: ${{ secrets.NEXT_PUBLIC_AMIRON_URL }}
+          NEXT_PUBLIC_AMIRON_URL: ${{ steps.urls.outputs.amiron_url }}
+
+      - name: Build Amiron
+        run: pnpm run build:github:amiron
+        env:
+          VITE_BASE_PATH: ${{ steps.repo.outputs.base_path }}/amiron
 
       - name: Merge build outputs
         run: |
@@ -92,6 +120,14 @@ jobs:
             if [ -d "apps/necrodev/out/_next" ]; then
               cp -r apps/necrodev/out/_next apps/necroplay/out/necrodev/
             fi
+          fi
+          
+          # Amiron'un build output'unu necroplay'in build output'una kopyala
+          # Amiron /NecroVerse/amiron path'inde olacak
+          if [ -d "apps/amiron/dist" ]; then
+            mkdir -p apps/necroplay/out/amiron
+            # Amiron'un tüm dosyalarını kopyala
+            cp -r apps/amiron/dist/* apps/necroplay/out/amiron/
           fi
 
       - name: Setup Pages

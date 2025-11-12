@@ -13,6 +13,7 @@
     "build:github:necroplay": "NEXT_EXPORT=true pnpm --filter @necroverse/necroplay build",
     "build:github:necrodev:local": "cross-env NEXT_EXPORT=true NEXT_PUBLIC_BASE_PATH= pnpm --filter @necroverse/necrodev build",
     "build:github:necroplay:local": "cross-env NEXT_EXPORT=true NEXT_PUBLIC_BASE_PATH= pnpm --filter @necroverse/necroplay build",
+    "build:github:amiron": "VITE_BASE_PATH=/NecroVerse/amiron pnpm --filter @amiron/exec build && pnpm --filter @amiron/pal build && pnpm --filter @amiron/workbench build && pnpm --filter @amiron/ritual-api build && pnpm --filter amiron build",
     "serve:necrodev": "cd apps/necrodev/out && npx serve -p 3000",
     "serve:necroplay": "cd apps/necroplay/out && npx serve -p 3001",
     "build:netlify:all": "pnpm install --no-frozen-lockfile && pnpm --filter @necroverse/necrodev build && pnpm --filter @necroverse/necroplay build",

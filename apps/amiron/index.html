@@ -71,13 +71,13 @@
 </head>
 <body>
   <div id="portal-nav">
-    <button class="portal-btn home" onclick="window.location.href='http://localhost:3001'">
+    <button class="portal-btn home" onclick="window.location.href=window.location.origin + (window.location.pathname.includes('/amiron') ? '/NecroVerse' : '')">
       ☠️ NecroVerse
     </button>
-    <button class="portal-btn" onclick="window.location.href='http://localhost:3001/lab'">
+    <button class="portal-btn" onclick="window.location.href=window.location.origin + (window.location.pathname.includes('/amiron') ? '/NecroVerse/necrodev' : '/necrodev')">
       🧠 NecroDev
     </button>
-    <button class="portal-btn" onclick="window.location.href='http://localhost:3002'">
+    <button class="portal-btn" onclick="window.location.href=window.location.origin + (window.location.pathname.includes('/amiron') ? '/NecroVerse' : '')">
       💀 NecroPlay
     </button>
   </div>
